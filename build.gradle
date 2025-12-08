@@ -1,0 +1,19 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // 升级Android Gradle插件版本
+        classpath 'com.android.tools.build:gradle:8.2.2'
+    }
+}
+
+allprojects {
+    repositories {
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}

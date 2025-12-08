@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- 优先级颜色 -->
+    <color name="priority_high">#FFFF5252</color>
+    <color name="priority_medium">#FFFFC107</color>
+    <color name="priority_low">#FF4CAF50</color>
+
+    <!-- 分类颜色 -->
+    <color name="category_life">#FFFF4081</color>
+    <color name="category_work">#FF3F51B5</color>
+    <color name="category_study">#FF4CAF50</color>
+    <color name="category_other">#FF9C27B0</color>
+
+    <!-- 背景颜色 -->
+    <color name="background">#FFF5F5F5</color>
+    <color name="surface">#FFFFFFFF</color>
+</resources>
