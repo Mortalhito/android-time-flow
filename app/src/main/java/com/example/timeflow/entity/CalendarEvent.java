@@ -3,11 +3,14 @@ package com.example.timeflow.entity;
 
 import com.example.timeflow.R;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class CalendarEvent {
+public class CalendarEvent implements Serializable {
+
+    private static final long serialVersionUID = 1L; // 添加序列化版本UID
     private String title;
     private String date;
     private String priority; // "high", "medium", "low"
@@ -54,10 +57,10 @@ public class CalendarEvent {
 
     public int getPriorityColor() {
         switch (priority) {
-            case "high": return R.color.priority_high;
-            case "medium": return R.color.priority_medium;
-            case "low": return R.color.priority_low;
-            default: return R.color.priority_medium;
+            case "high": return R.color.red;
+            case "medium": return R.color.yellow;
+            case "low": return R.color.green;
+            default: return R.color.green;
         }
     }
 

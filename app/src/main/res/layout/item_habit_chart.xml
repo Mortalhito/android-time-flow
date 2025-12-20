@@ -18,14 +18,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="习惯名称"
+            android:text="@string/habit_name"
             android:textSize="14sp" />
 
         <TextView
             android:id="@+id/tvPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="0%"
+            android:text="@string/habit_completion_rate"
             android:textSize="12sp"
             android:textStyle="bold" />
 

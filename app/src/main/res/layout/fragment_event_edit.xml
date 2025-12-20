@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -10,9 +11,10 @@
         android:padding="24dp">
 
         <TextView
+            android:id="@+id/tvDialogTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="添加事务"
+            android:text="@string/add_event"
             android:textSize="20sp"
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
@@ -26,7 +28,7 @@
                 android:id="@+id/etEventTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="事务标题" />
+                android:hint="@string/event_name" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -39,7 +41,7 @@
                 android:id="@+id/etEventDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="日期 (YYYY-MM-DD)"
+                android:hint="@string/date"
                 android:focusable="false"
                 android:clickable="true" />
 
@@ -54,7 +56,7 @@
                 android:id="@+id/etEventTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="时间 (HH:mm)"
+                android:hint="@string/time"
                 android:focusable="false"
                 android:clickable="true" />
 
@@ -71,31 +73,33 @@
             android:id="@+id/priorityToggle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="16dp"
+            app:singleSelection="true"
+            app:selectionRequired="true">
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPriorityHigh"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="非常紧急"
-                android:backgroundTint="@color/priority_high" />
+                android:text="@string/high"
+                style="@style/Widget.Material3.Button.TonalButton" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPriorityMedium"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="一般紧急"
-                android:backgroundTint="@color/priority_medium" />
+                android:text="@string/middle"
+                style="@style/Widget.Material3.Button.TonalButton" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnPriorityLow"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="不紧急"
-                android:backgroundTint="@color/priority_low" />
+                android:text="@string/low"
+                style="@style/Widget.Material3.Button.TonalButton" />
 
         </com.google.android.material.button.MaterialButtonToggleGroup>
 
@@ -124,16 +128,28 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <LinearLayout
+            android:id="@+id/layoutButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
+            <!-- 添加删除按钮，默认隐藏 -->
+            <Button
+                android:id="@+id/btnDelete"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/delete"
+                android:backgroundTint="@color/red"
+                android:visibility="gone"
+                android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/btnCancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="取消"
+                android:text="@string/cancel"
                 android:layout_marginEnd="8dp"
                 android:backgroundTint="#666" />
 
@@ -142,7 +158,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="确认添加"
+                android:text="@string/confirm"
                 android:backgroundTint="@color/black" />
 
         </LinearLayout>

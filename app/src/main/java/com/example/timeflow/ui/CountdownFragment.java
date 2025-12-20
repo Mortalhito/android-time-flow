@@ -51,8 +51,8 @@ public class CountdownFragment extends Fragment {
     private void initData() {
         eventList = new ArrayList<>();
         // 示例数据
-        eventList.add(new CountdownEvent("生日", "生活", "2025-12-25", 15));
-        eventList.add(new CountdownEvent("项目截止", "工作", "2025-11-30", 30));
+        eventList.add(new CountdownEvent("生日", "生活", "2025-12-25"));
+        eventList.add(new CountdownEvent("项目截止", "工作", "2025-11-30"));
     }
 
     private void setupRecyclerView() {
@@ -80,7 +80,7 @@ public class CountdownFragment extends Fragment {
             String category = getSelectedCategory();
 
             if (!name.isEmpty() && !date.isEmpty()) {
-                CountdownEvent newEvent = new CountdownEvent(name, category, date, 0);
+                CountdownEvent newEvent = new CountdownEvent(name, category, date);
                 eventList.add(newEvent);
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();

@@ -1,4 +1,4 @@
-package com.example.timeflow.calendar;
+package com.example.timeflow.view;
 
 
 import android.content.Context;
@@ -102,6 +102,13 @@ public class CustomCalendarView extends LinearLayout {
         this.dateListener = listener;
         if (adapter != null) {
             adapter.setOnDateSelectedListener(listener);
+        }
+    }
+
+    // 在类中添加
+    public void setSelectedDate(int year, int month, int day) {
+        if (adapter != null) {
+            adapter.setSelectedDate(year, month, day);
         }
     }
 }

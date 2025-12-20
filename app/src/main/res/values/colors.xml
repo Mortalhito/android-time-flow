@@ -4,9 +4,9 @@
     <color name="white">#FFFFFFFF</color>
 
     <!-- 优先级颜色 -->
-    <color name="priority_high">#FFFF5252</color>
-    <color name="priority_medium">#FFFFC107</color>
-    <color name="priority_low">#FF4CAF50</color>
+    <color name="red">#FFFF5252</color>
+    <color name="yellow">#FFFFC107</color>
+    <color name="green">#FF4CAF50</color>
 
     <!-- 分类颜色 -->
     <color name="category_life">#FFFF4081</color>
@@ -17,4 +17,5 @@
     <!-- 背景颜色 -->
     <color name="background">#FFF5F5F5</color>
     <color name="surface">#FFFFFFFF</color>
+    <color name="gray_light">#E0E0E0</color>
 </resources>

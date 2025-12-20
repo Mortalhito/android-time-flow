@@ -12,11 +12,10 @@ public class CountdownEvent {
     private int daysLeft;
     private String id;
 
-    public CountdownEvent(String name, String category, String targetDate, int daysLeft) {
+    public CountdownEvent(String name, String category, String targetDate) {
         this.name = name;
         this.category = category;
         this.targetDate = targetDate;
-        this.daysLeft = daysLeft;
         this.id = String.valueOf(System.currentTimeMillis());
         calculateDaysLeft();
     }

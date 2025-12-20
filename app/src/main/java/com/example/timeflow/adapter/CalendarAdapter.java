@@ -8,13 +8,17 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.example.timeflow.R;
-import com.example.timeflow.calendar.CustomCalendarView;
+import com.example.timeflow.view.CustomCalendarView;
 import com.example.timeflow.entity.CalendarEvent;
 
 import java.util.Calendar;
 import java.util.List;
 
 public class CalendarAdapter extends BaseAdapter {
+
+    private int selectedYear = -1;
+    private int selectedMonth = -1;
+    private int selectedDay = -1;
 
     private Context context;
     private Calendar currentDate;
@@ -25,6 +29,13 @@ public class CalendarAdapter extends BaseAdapter {
         this.context = context;
         this.currentDate = (Calendar) currentDate.clone();
         this.eventList = eventList;
+    }
+
+    public void setSelectedDate(int year, int month, int day) {
+        this.selectedYear = year;
+        this.selectedMonth = month;
+        this.selectedDay = day;
+        notifyDataSetChanged();
     }
 
     public void setCurrentDate(Calendar currentDate) {
@@ -65,6 +76,9 @@ public class CalendarAdapter extends BaseAdapter {
         View dot2 = convertView.findViewById(R.id.dot2);
         View dot3 = convertView.findViewById(R.id.dot3);
 
+        // 添加背景View
+        View backgroundView = convertView.findViewById(R.id.backgroundView); // 需要在布局中添加
+
         // 计算当前单元格对应的日期
         Calendar calendar = (Calendar) currentDate.clone();
         calendar.set(Calendar.DAY_OF_MONTH, 1);
@@ -77,8 +91,18 @@ public class CalendarAdapter extends BaseAdapter {
             dot1.setVisibility(View.INVISIBLE);
             dot2.setVisibility(View.INVISIBLE);
             dot3.setVisibility(View.INVISIBLE);
+            backgroundView.setVisibility(View.INVISIBLE); // 隐藏背景
         } else {
             tvDay.setText(String.valueOf(day));
+
+            // 判断是否为选中日期
+            boolean isSelected = (selectedYear == currentDate.get(Calendar.YEAR) &&
+                    selectedMonth == currentDate.get(Calendar.MONTH) &&
+                    selectedDay == day);
+
+            // 设置背景可见性
+            backgroundView.setVisibility(isSelected ? View.VISIBLE : View.INVISIBLE);
+
             // 检查这一天是否有事件
             String dateStr = String.format("%d-%02d-%02d",
                     currentDate.get(Calendar.YEAR),

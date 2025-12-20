@@ -58,11 +58,11 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         // 设置进度条颜色
         int color;
         if (totalCompletionRate >= 80) {
-            color = holder.itemView.getContext().getResources().getColor(R.color.priority_low);
+            color = holder.itemView.getContext().getResources().getColor(R.color.red);
         } else if (totalCompletionRate >= 50) {
-            color = holder.itemView.getContext().getResources().getColor(R.color.priority_medium);
+            color = holder.itemView.getContext().getResources().getColor(R.color.yellow);
         } else {
-            color = holder.itemView.getContext().getResources().getColor(R.color.priority_high);
+            color = holder.itemView.getContext().getResources().getColor(R.color.green);
         }
         holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
 

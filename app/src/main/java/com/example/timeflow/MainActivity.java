@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
         // 默认显示首页
         showFragment(homeFragment);
+        bottomNav.setSelectedItemId(R.id.nav_home);
     }
 
     private void initFragments() {

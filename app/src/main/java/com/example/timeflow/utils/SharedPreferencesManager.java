@@ -16,7 +16,7 @@ public class SharedPreferencesManager {
         prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     }
 
-    // 使用简单的键值对存储，不需要Gson
+    // 使用简单的键值对存储
     public void saveCountdownEvents(List<CountdownEvent> events) {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putInt("countdown_events_size", events.size());
@@ -44,7 +44,7 @@ public class SharedPreferencesManager {
             String targetDate = prefs.getString(prefix + "targetDate", "");
 
             if (!name.isEmpty()) {
-                CountdownEvent event = new CountdownEvent(name, category, targetDate, 0);
+                CountdownEvent event = new CountdownEvent(name, category, targetDate);
                 event.setId(id);
                 events.add(event);
             }

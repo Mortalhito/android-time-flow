@@ -99,11 +99,11 @@ public class HabitFragment extends Fragment {
             // 设置不同的颜色
             int color;
             if (completionRate >= 80) {
-                color = getResources().getColor(R.color.priority_low);
+                color = getResources().getColor(R.color.red);
             } else if (completionRate >= 50) {
-                color = getResources().getColor(R.color.priority_medium);
+                color = getResources().getColor(R.color.yellow);
             } else {
-                color = getResources().getColor(R.color.priority_high);
+                color = getResources().getColor(R.color.green);
             }
             progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
 
