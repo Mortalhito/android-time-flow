@@ -40,7 +40,7 @@ public class SharedPreferencesManager {
             String prefix = "countdown_event_" + i + "_";
             String id = prefs.getString(prefix + "id", "");
             String name = prefs.getString(prefix + "name", "");
-            String category = prefs.getString(prefix + "category", "");
+            int category = Integer.parseInt(prefs.getString(prefix + "category", ""));
             String targetDate = prefs.getString(prefix + "targetDate", "");
 
             if (!name.isEmpty()) {

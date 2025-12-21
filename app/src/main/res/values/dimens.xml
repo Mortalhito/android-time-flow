@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 分类按钮的内边距 -->
+    <dimen name="category_padding">12dp</dimen>
+
+    <!-- 其他可能需要的尺寸 -->
+    <dimen name="button_corner_radius">8dp</dimen>
+    <dimen name="item_margin">8dp</dimen>
+    <dimen name="text_size_small">14sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_large">18sp</dimen>
+    <dimen name="item_padding">16dp</dimen>
+</resources>

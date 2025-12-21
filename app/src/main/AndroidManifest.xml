@@ -20,13 +20,18 @@
 
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.Timeflow"> <!-- 确保使用正确的主题 -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
+        <!-- 详情页使用无操作栏主题 -->
+        <activity
+            android:name=".ui.CountdownDetailActivity"
+            android:exported="false" />
         <!-- 专注模式服务 -->
         <service android:name=".service.FocusModeService" />
 

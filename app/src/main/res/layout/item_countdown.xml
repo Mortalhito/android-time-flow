@@ -6,7 +6,8 @@
     android:padding="16dp"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true">
+    android:focusable="true"
+    android:layout_margin="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/event_name"
+            android:text="事件名称"
             android:textSize="18sp"
             android:textStyle="bold" />
 
@@ -28,10 +29,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/category_bg"
-            android:padding="4dp"
-            android:text="@string/sort"
+            android:padding="8dp"
+            android:text="分类"
             android:textColor="@color/white"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:layout_marginStart="8dp" />
 
     </LinearLayout>
 
@@ -39,15 +41,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/tvDaysLeft"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/time"
+            android:text="时间"
             android:textSize="24sp"
-            android:textColor="#FF4081"
             android:textStyle="bold" />
 
         <TextView
