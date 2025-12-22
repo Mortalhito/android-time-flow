@@ -21,6 +21,7 @@
 
     <!-- 新增详情页背景色 -->
     <color name="section1_blue">#2196F3</color>
+    <color name="section1_orange">#2196F3</color>
     <color name="section3_gray">#F5F5F5</color>
 
     <color name="purple_200">#FFBB86FC</color>

@@ -16,6 +16,7 @@ import com.example.timeflow.entity.CountdownEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class CountdownDetailActivity extends AppCompatActivity {
@@ -73,8 +74,12 @@ public class CountdownDetailActivity extends AppCompatActivity {
 
     // 新增方法：设置各部分背景色
     private void setupSectionBackgrounds() {
-        // 第一部分：蓝色背景
-        section1.setBackgroundColor(getResources().getColor(R.color.section1_blue));
+        // 第一部分：蓝/橙色背景
+        if(currentEvent.isPast()){
+            section1.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
+        } else {
+            section1.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+        }
 
         // 第二部分：白色背景（默认就是白色，可以不用设置）
         section2.setBackgroundColor(Color.WHITE);
@@ -87,18 +92,30 @@ public class CountdownDetailActivity extends AppCompatActivity {
         databaseHelper = new DatabaseHelper(this);
 
         String eventId = getIntent().getStringExtra("event_id");
+        String debugEventName = getIntent().getStringExtra("debug_event_name");
+
+        System.out.println("接收到的事件ID: " + eventId);
+        System.out.println("调试事件名称: " + debugEventName);
+
         if (eventId != null) {
             try {
                 currentEvent = databaseHelper.getEventById(eventId);
                 if (currentEvent != null) {
                     displayEventDetails();
                 } else {
-                    Toast.makeText(this, "事件不存在", Toast.LENGTH_SHORT).show();
+                    // 尝试从事件列表中查找
+                    List<CountdownEvent> allEvents = databaseHelper.getAllEvents();
+                    System.out.println("数据库中总事件数: " + allEvents.size());
+                    for (CountdownEvent e : allEvents) {
+                        System.out.println("数据库中的事件: ID=" + e.getId() + ", 名称=" + e.getSafeName());
+                    }
+
+                    Toast.makeText(this, "事件不存在，ID: " + eventId, Toast.LENGTH_LONG).show();
                     finish();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                Toast.makeText(this, "加载事件失败", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "加载事件失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 finish();
             }
         } else {

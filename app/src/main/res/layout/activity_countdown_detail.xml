@@ -5,24 +5,16 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- 工具栏 -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary">
 
-        <!-- 返回按钮 -->
-        <ImageButton
-            android:id="@+id/btnBack"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@color/section1_blue"
-            app:tint="@android:color/white" />
-
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+
             android:layout_weight="1"
             android:gravity="center"
             android:text="纪念日详情"
@@ -35,15 +27,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
 
+            android:layout_marginLeft="380sp"
             app:tint="@android:color/white" />
 
     </com.google.android.material.appbar.MaterialToolbar>
 
-    <!-- 主要内容区域 -->
     <ScrollView
+
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:paddingTop="150sp"
+
+        android:paddingStart="50sp"
+        android:paddingEnd="50sp"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -51,37 +49,38 @@
             android:orientation="vertical">
 
             <!-- 第一部分：蓝色背景 -->
+
+            <!-- 第二部分：白色背景，可点击 -->
             <LinearLayout
                 android:id="@+id/section1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:background="@color/section1_blue"
                 android:orientation="vertical"
-                android:padding="24dp"
-                android:background="@color/section1_blue">
+                android:padding="24dp">
 
                 <TextView
                     android:id="@+id/tvEventTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
                     android:text="纪念日名称"
                     android:textColor="@android:color/white"
                     android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:gravity="center" />
+                    android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/tvTimePrefix"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
                     android:text="还有"
                     android:textColor="@android:color/white"
-                    android:textSize="18sp"
-                    android:gravity="center"
-                    android:layout_marginTop="8dp" />
+                    android:textSize="18sp" />
 
             </LinearLayout>
 
-            <!-- 第二部分：白色背景，可点击 -->
             <LinearLayout
                 android:id="@+id/section2"
                 android:layout_width="match_parent"

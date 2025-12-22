@@ -54,17 +54,25 @@
             android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
-        <!-- 修改：使用 ScrollView 包裹分类选择区域 -->
+        <!-- 添加提示文本 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击选择分类，再次点击可取消选择"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
         <ScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="150dp"> <!-- 限制最大高度 -->
+            android:maxHeight="150dp">
 
             <LinearLayout
                 android:id="@+id/categoryContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" /> <!-- 改为垂直布局 -->
+                android:orientation="vertical" />
 
         </ScrollView>
     </LinearLayout>

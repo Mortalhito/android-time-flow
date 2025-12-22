@@ -16,7 +16,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "countdown.db";
     private static final int DATABASE_VERSION = 2;
-
+    private static final String KEY_EVENT_CATEGORY_ID = "category_id";
     // 事件表
     private static final String TABLE_EVENTS = "events";
     private static final String COLUMN_ID = "id";
@@ -111,33 +111,63 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public CountdownEvent getEventById(String eventId) {
+        if (eventId == null || eventId.isEmpty()) {
+            return null;
+        }
+
         CountdownEvent event = null;
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = "SELECT * FROM " + TABLE_EVENTS + " WHERE " + COLUMN_ID + " = ?";
-        Cursor cursor = db.rawQuery(query, new String[]{eventId});
+        try {
+            String query = "SELECT e.*, c." + COLUMN_CATEGORY_NAME + ", c." + COLUMN_COLOR +
+                    " FROM " + TABLE_EVENTS + " e " +
+                    "LEFT JOIN " + TABLE_CATEGORIES + " c ON e." + COLUMN_CATEGORY_ID + " = c." + COLUMN_ID +
+                    " WHERE e." + COLUMN_ID + " = ?";
 
-        if (cursor.moveToFirst()) {
-            event = new CountdownEvent(
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)),
-                    cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TARGET_DATE))
-            );
-            event.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+            Cursor cursor = db.rawQuery(query, new String[]{eventId});
 
-            // 设置分类信息
-            Category category = getCategoryById(event.getCategoryId());
-            if (category != null) {
-                event.setCategoryName(category.getName());
-                event.setCategoryColor(category.getColor());
+            if (cursor.moveToFirst()) {
+                event = new CountdownEvent();
+                event.setId(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_ID)));
+                event.setName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_NAME)));
+                event.setCategoryId(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_ID)));
+                event.setTargetDate(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TARGET_DATE)));
+                event.setCategoryName(cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_CATEGORY_NAME)));
+                event.setCategoryColor(cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_COLOR)));
+
+                // 计算天数
+                event.calculateDaysLeft();
             }
-
-            // 计算天数
-            event.calculateDaysLeft();
+            cursor.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            db.close();
         }
-
-        cursor.close();
         return event;
+    }
+
+    // 在 DatabaseHelper 类中添加以下方法
+    public boolean isCategoryUsedByEvents(long categoryId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+
+        try {
+            String query = "SELECT COUNT(*) FROM " + TABLE_EVENTS +
+                    " WHERE " + COLUMN_CATEGORY_ID + " = ?"; // 使用正确的列名
+            cursor = db.rawQuery(query, new String[]{String.valueOf(categoryId)});
+
+            if (cursor != null && cursor.moveToFirst()) {
+                int count = cursor.getInt(0);
+                return count > 0;
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close(); // 确保关闭数据库
+        }
+        return false;
     }
 
     public List<CountdownEvent> getAllEvents() {
@@ -183,7 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
-    public void deleteCategory(int categoryId) {
+    public boolean deleteCategory(int categoryId) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // 首先检查是否有事件使用这个分类
@@ -195,7 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             // 如果有事件使用该分类，不能删除
             cursor.close();
             db.close();
-            return;
+            return false;
         }
         cursor.close();
 
@@ -204,6 +234,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_ID + " = ? AND " + COLUMN_IS_DEFAULT + " = 0",
                 new String[]{String.valueOf(categoryId)});
         db.close();
+
+        return true;
     }
 
     public List<Category> getAllCategories() {

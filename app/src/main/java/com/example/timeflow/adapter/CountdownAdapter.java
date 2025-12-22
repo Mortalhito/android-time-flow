@@ -110,11 +110,10 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
 
         holder.itemView.setBackground(backgroundDrawable);
 
-        // 修复：使用正确的 Context 获取资源
+        // 使用正确的 Context 获取资源
         int padding = holder.itemView.getContext().getResources().getDimensionPixelSize(R.dimen.item_padding);
         holder.itemView.setPadding(padding, padding, padding, padding);
 
-// 在onBindViewHolder方法中修改点击事件
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onItemClick(event);
@@ -123,6 +122,10 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
             // 添加跳转到详情页的代码
             Intent intent = new Intent(context, CountdownDetailActivity.class);
             intent.putExtra("event_id", event.getId());
+
+            // 添加调试信息到Intent
+            intent.putExtra("debug_event_name", event.getSafeName());
+
             context.startActivity(intent);
         });
 
