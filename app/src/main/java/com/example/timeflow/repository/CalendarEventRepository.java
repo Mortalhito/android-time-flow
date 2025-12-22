@@ -2,7 +2,7 @@ package com.example.timeflow.repository;
 
 import android.content.Context;
 
-import com.example.timeflow.dao.AppDatabase;
+import com.example.timeflow.database.AppDatabase;
 import com.example.timeflow.dao.CalendarEventDao;
 import com.example.timeflow.entity.CalendarEvent;
 

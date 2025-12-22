@@ -38,39 +38,70 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    // 在onBindViewHolder方法中更新进度显示逻辑
+    // 修复后的 onBindViewHolder 方法
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // 添加空值检查
+        if (habitList == null || position < 0 || position >= habitList.size()) {
+            return;
+        }
+
         Habit habit = habitList.get(position);
-
-        holder.tvHabitName.setText(habit.getName());
-        holder.cbCompleted.setChecked(habit.isCompletedToday());
-
-        // 计算总完成率
-        float totalCompletionRate = 0;
-        if (habit.getTotalDays() > 0) {
-            totalCompletionRate = (float) habit.getCompletedDays() / habit.getTotalDays() * 100;
+        if (habit == null) {
+            return;
         }
 
-        holder.tvProgress.setText(String.format("%d/%d 天 (%.0f%%)",
-                habit.getCompletedDays(), habit.getTotalDays(), totalCompletionRate));
-        holder.progressBar.setProgress((int) totalCompletionRate);
+        // 添加空值检查
+        if (holder.tvHabitName != null) {
+            holder.tvHabitName.setText(habit.getName());
 
-        // 设置进度条颜色
-        int color;
-        if (totalCompletionRate >= 80) {
-            color = holder.itemView.getContext().getResources().getColor(R.color.red);
-        } else if (totalCompletionRate >= 50) {
-            color = holder.itemView.getContext().getResources().getColor(R.color.yellow);
-        } else {
-            color = holder.itemView.getContext().getResources().getColor(R.color.green);
+            // 显示每日目标次数
+            String targetText = habit.getDailyTargetCount() > 1 ?
+                    String.format("(%d/%d)", habit.getTodayCompletedCount(), habit.getDailyTargetCount()) : "";
+            holder.tvHabitName.setText(habit.getName() + targetText);
         }
-        holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
 
-        holder.cbCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (listener != null) {
-                listener.onHabitChecked(habit, holder.getAdapterPosition(), isChecked);
+        if (holder.cbCompleted != null) {
+            holder.cbCompleted.setChecked(habit.isCompletedToday());
+            holder.cbCompleted.setEnabled(habit.isTodayInFrequency());
+
+            // 修复监听器设置，避免重复触发
+            holder.cbCompleted.setOnCheckedChangeListener(null);
+            holder.cbCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
+                    listener.onHabitChecked(habit, adapterPosition, isChecked);
+                }
+            });
+        }
+
+        // 进度显示逻辑
+        if (holder.tvProgress != null && holder.progressBar != null) {
+            float totalCompletionRate = 0;
+            if (habit.getTotalDays() > 0) {
+                totalCompletionRate = (float) habit.getCompletedDays() / habit.getTotalDays() * 100;
             }
-        });
+
+            holder.tvProgress.setText(String.format("%d/%d 天 (%.0f%%)",
+                    habit.getCompletedDays(), habit.getTotalDays(), totalCompletionRate));
+            holder.progressBar.setProgress((int) totalCompletionRate);
+
+            // 设置进度条颜色
+            try {
+                int color;
+                if (totalCompletionRate >= 80) {
+                    color = holder.itemView.getContext().getResources().getColor(R.color.red);
+                } else if (totalCompletionRate >= 50) {
+                    color = holder.itemView.getContext().getResources().getColor(R.color.yellow);
+                } else {
+                    color = holder.itemView.getContext().getResources().getColor(R.color.green);
+                }
+                holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
