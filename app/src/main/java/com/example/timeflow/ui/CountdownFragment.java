@@ -246,6 +246,7 @@ public class CountdownFragment extends Fragment {
     }
 
     // 完善添加分类对话框
+    // 在 CountdownFragment 中修改 showAddCategoryDialog 方法
     private void showAddCategoryDialog(BottomSheetDialog parentDialog, CategoryAdapter categoryAdapter) {
         BottomSheetDialog dialog = new BottomSheetDialog(getContext());
         View dialogView = LayoutInflater.from(getContext()).inflate(R.layout.dialog_add_category, null);
@@ -261,7 +262,7 @@ public class CountdownFragment extends Fragment {
         );
 
         ColorAdapter colorAdapter = new ColorAdapter(colorList);
-        colorRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 6)); // 改为6列显示更多颜色
+        colorRecyclerView.setLayoutManager(new GridLayoutManager(getContext(), 6));
         colorRecyclerView.setAdapter(colorAdapter);
 
         btnConfirm.setOnClickListener(v -> {
@@ -275,6 +276,45 @@ public class CountdownFragment extends Fragment {
 
         dialog.setContentView(dialogView);
         dialog.show();
+    }
+
+    private void addNewCategory(String name, int color, BottomSheetDialog parentDialog,
+                                BottomSheetDialog currentDialog, CategoryAdapter categoryAdapter) {
+        long newCategoryId = databaseHelper.addCategory(name, color);
+
+        if (newCategoryId != -1) {
+            // 刷新分类数据
+            refreshCategoryData();
+
+            // 修复：确保 categoryAdapter 不为 null，然后调用 updateData
+            if (categoryAdapter != null) {
+                categoryAdapter.updateData(categoryList);
+            }
+
+            // 如果 categoryAdapter 为 null，重新创建适配器
+            if (categoryAdapter == null) {
+                // 重新获取 RecyclerView 并设置适配器
+                RecyclerView categoryRecyclerView = parentDialog.findViewById(R.id.categoryRecyclerView);
+                if (categoryRecyclerView != null) {
+                    categoryAdapter = new CategoryAdapter(categoryList, getContext());
+                    categoryRecyclerView.setAdapter(categoryAdapter);
+                }
+            }
+
+            currentDialog.dismiss();
+            Toast.makeText(getContext(), "分类添加成功", Toast.LENGTH_SHORT).show();
+
+            // 刷新添加事件对话框中的分类列表
+            refreshCategorySelectionInAddEventDialog();
+        } else {
+            Toast.makeText(getContext(), "分类添加失败", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // 新增方法：刷新添加事件对话框中的分类选择
+    private void refreshCategorySelectionInAddEventDialog() {
+        // 这里可以添加逻辑来刷新添加事件对话框中的分类列表
+        // 例如，如果添加事件对话框是打开的，需要更新它的分类选择器
     }
 
     private boolean validateCategoryInput(String name, int selectedColor) {
@@ -298,29 +338,7 @@ public class CountdownFragment extends Fragment {
         return true;
     }
 
-    private void addNewCategory(String name, int color, BottomSheetDialog parentDialog,
-                                BottomSheetDialog currentDialog, CategoryAdapter categoryAdapter) {
-        long newCategoryId = databaseHelper.addCategory(name, color);
 
-        if (newCategoryId != -1) {
-            refreshCategoryData();
-
-            // 刷新分类适配器
-            if (categoryAdapter != null) {
-                categoryAdapter.updateData(categoryList);
-            }
-
-            // 通知监听器分类已更新
-            if (categoryUpdateListener != null) {
-                categoryUpdateListener.onCategoryUpdated();
-            }
-
-            currentDialog.dismiss();
-            Toast.makeText(getContext(), "分类添加成功", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(getContext(), "分类添加失败", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     // 完善分类选择设置
     private void setupCategorySelection(LinearLayout container) {

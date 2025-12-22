@@ -1,4 +1,3 @@
-// 在 EventAdapter.java 中添加点击监听
 package com.example.timeflow.adapter;
 
 import android.view.LayoutInflater;
@@ -14,7 +13,7 @@ import com.example.timeflow.entity.CalendarEvent;
 
 import java.util.List;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHolder> {
+public class CalendarEventAdapter extends RecyclerView.Adapter<CalendarEventAdapter.EventViewHolder> {
 
     private List<CalendarEvent> eventList;
     private OnItemClickListener onItemClickListener;
@@ -27,7 +26,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
         this.onItemClickListener = listener;
     }
 
-    public EventAdapter(List<CalendarEvent> eventList) {
+    public CalendarEventAdapter(List<CalendarEvent> eventList) {
         this.eventList = eventList;
     }
 

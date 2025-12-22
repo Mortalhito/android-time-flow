@@ -5,14 +5,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timeflow.R;
-import com.example.timeflow.adapter.EventAdapter;
+import com.example.timeflow.adapter.CalendarEventAdapter;
 import com.example.timeflow.entity.CalendarEvent;
+import com.example.timeflow.repository.CalendarEventRepository;
 import com.example.timeflow.view.CustomCalendarView;
 
 import java.util.ArrayList;
@@ -23,10 +25,11 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
 
     private CustomCalendarView calendarView;
     private RecyclerView recyclerViewEvents;
-    private EventAdapter eventAdapter;
+    private CalendarEventAdapter calendarEventAdapter;
     private List<CalendarEvent> eventList;
     private ImageView imageView;
     private String currentSelectedDate;
+    private CalendarEventRepository calendarEventRepository;
 
     public HomeFragment() {}
 
@@ -40,6 +43,7 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
         setupCalendar();
         setupEventList();
         setupAddEvent();
+        loadAllEvents();
         return view;
     }
 
@@ -51,11 +55,28 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
 
     private void initData() {
         eventList = new ArrayList<>();
+        calendarEventRepository = new CalendarEventRepository(requireContext());
+    }
+
+    private void loadAllEvents() {
+        calendarEventRepository.loadAllEvents(new CalendarEventRepository.DataLoadListener() {
+            @Override
+            public void onDataLoaded(List<CalendarEvent> events) {
+                eventList.clear();
+                eventList.addAll(events);
+                calendarView.setEventList(eventList);
+                showEventsForDate(currentSelectedDate);
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "加载事件失败", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setupAddEvent(){
         imageView.setOnClickListener(view -> {
-            // 使用当前选中的日期，如果没有则使用今天
             String date = currentSelectedDate != null ? currentSelectedDate :
                     String.format("%d-%02d-%02d",
                             Calendar.getInstance().get(Calendar.YEAR),
@@ -73,12 +94,9 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
         calendarView.setOnDateSelectedListener((year, month, day) -> {
             currentSelectedDate = String.format("%d-%02d-%02d", year, month + 1, day);
             showEventsForDate(currentSelectedDate);
-
-            // 设置选中日期
             calendarView.setSelectedDate(year, month, day);
         });
 
-        // 设置当前日期为选中状态
         Calendar calendar = Calendar.getInstance();
         calendarView.setSelectedDate(calendar);
         calendarView.setSelectedDate(
@@ -87,7 +105,6 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
                 calendar.get(Calendar.DAY_OF_MONTH)
         );
 
-        // 初始化当前选中日期
         currentSelectedDate = String.format("%d-%02d-%02d",
                 calendar.get(Calendar.YEAR),
                 calendar.get(Calendar.MONTH) + 1,
@@ -95,63 +112,69 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
     }
 
     private void setupEventList() {
-        eventAdapter = new EventAdapter(eventList);
-        eventAdapter.setOnItemClickListener(new EventAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(CalendarEvent event) {
-                // 点击事务项，弹出编辑对话框
-                EventEditDialogFragment dialog = EventEditDialogFragment.newInstance(event);
-                dialog.setOnEventSaveListener(HomeFragment.this);
-                dialog.show(getParentFragmentManager(), "EventEditDialogFragment");
-            }
+        calendarEventAdapter = new CalendarEventAdapter(eventList);
+        calendarEventAdapter.setOnItemClickListener(event -> {
+            EventEditDialogFragment dialog = EventEditDialogFragment.newInstance(event);
+            dialog.setOnEventSaveListener(HomeFragment.this);
+            dialog.show(getParentFragmentManager(), "EventEditDialogFragment");
         });
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerViewEvents.setAdapter(eventAdapter);
-
-        // 显示当前日期的事件
-        showEventsForDate(currentSelectedDate);
+        recyclerViewEvents.setAdapter(calendarEventAdapter);
     }
 
     private void showEventsForDate(String date) {
-        List<CalendarEvent> dailyEvents = new ArrayList<>();
-        for (CalendarEvent event : eventList) {
-            if (event.getDate().equals(date)) {
-                dailyEvents.add(event);
+        calendarEventRepository.loadEventsByDate(date, new CalendarEventRepository.DataLoadListener() {
+            @Override
+            public void onDataLoaded(List<CalendarEvent> events) {
+                calendarEventAdapter.updateEvents(events);
             }
-        }
-        eventAdapter.updateEvents(dailyEvents);
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "加载当日事件失败", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    // 实现对话框的回调接口
     @Override
     public void onEventSave(CalendarEvent event, String mode) {
-        if ("add".equals(mode)) {
-            // 添加新事件
-            eventList.add(event);
-        } else {
-            // 修改事件 - 找到原有事件并替换
-            for (int i = 0; i < eventList.size(); i++) {
-                if (eventList.get(i).getId().equals(event.getId())) {
-                    eventList.set(i, event);
-                    break;
-                }
+        CalendarEventRepository.OperationListener listener = new CalendarEventRepository.OperationListener() {
+            @Override
+            public void onSuccess() {
+                loadAllEvents(); // 重新加载所有事件以更新日历显示
+                Toast.makeText(requireContext(),
+                        "add".equals(mode) ? "添加成功" : "修改成功",
+                        Toast.LENGTH_SHORT).show();
             }
-        }
 
-        // 更新日历视图
-        calendarView.setEventList(eventList);
-        // 刷新当前显示的事件列表
-        showEventsForDate(currentSelectedDate);
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(),
+                        "add".equals(mode) ? "添加失败" : "修改失败",
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        if ("add".equals(mode)) {
+            calendarEventRepository.insertEvent(event, listener);
+        } else {
+            calendarEventRepository.updateEvent(event, listener);
+        }
     }
 
     @Override
     public void onEventDelete(CalendarEvent event) {
-        // 删除事件
-        eventList.removeIf(e -> e.getId().equals(event.getId()));
+        calendarEventRepository.deleteEvent(event, new CalendarEventRepository.OperationListener() {
+            @Override
+            public void onSuccess() {
+                loadAllEvents();
+                Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show();
+            }
 
-        // 更新日历视图
-        calendarView.setEventList(eventList);
-        // 刷新当前显示的事件列表
-        showEventsForDate(currentSelectedDate);
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(requireContext(), "删除失败", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
