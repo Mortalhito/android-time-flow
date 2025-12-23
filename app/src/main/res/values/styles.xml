@@ -22,4 +22,13 @@
         <!-- 或者更彻底的方式 -->
         <item name="android:padding">0dp</item>
     </style>
+
+
+    <style name="Theme.FocusLock" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:showWhenLocked">true</item>
+        <item name="android:turnScreenOn">true</item>
+    </style>
 </resources>

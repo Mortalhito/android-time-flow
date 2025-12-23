@@ -4,19 +4,23 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.NumberPicker;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
 import com.example.timeflow.R;
+import com.example.timeflow.repository.FocusRecordRepository;
 import com.example.timeflow.service.FocusDeviceAdminReceiver;
-import com.example.timeflow.service.FocusModeService;
-import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+
+import java.util.Date;
+import java.util.Locale;
 
 public class FocusFragment extends Fragment {
 
@@ -24,7 +28,8 @@ public class FocusFragment extends Fragment {
     private Button btnStartFocus;
     private DevicePolicyManager devicePolicyManager;
     private ComponentName adminComponent;
-
+    private TextView tvTodayTotalTime; // 新增
+    private FocusRecordRepository repository; // 新增
     public FocusFragment() {}
 
     @Override
@@ -37,6 +42,9 @@ public class FocusFragment extends Fragment {
         setClickListeners();
         setupDeviceAdmin();
 
+        // 初始化 Repository
+        repository = new FocusRecordRepository(getActivity().getApplication());
+
         return view;
     }
 
@@ -44,11 +52,37 @@ public class FocusFragment extends Fragment {
         hourPicker = view.findViewById(R.id.hourPicker);
         minutePicker = view.findViewById(R.id.minutePicker);
         btnStartFocus = view.findViewById(R.id.btnStartFocus);
+        tvTodayTotalTime = view.findViewById(R.id.tvTodayTotalTime); //
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // 每次回到主界面时刷新今日时间
+        updateTodayTime();
+    }
+
+    private void updateTodayTime() {
+        String today = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // 开启子线程查询数据库
+        new Thread(() -> {
+            long totalMinutes = repository.getTodayTotalMinutes(today);
+
+            // 回到主线程更新 UI
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(() -> {
+                    tvTodayTotalTime.setText("今日总专注时间：" + totalMinutes + " 分钟");
+                });
+            }
+        }).start();
+    }
+
+
 
     private void setupNumberPickers() {
         hourPicker.setMinValue(0);
-        hourPicker.setMaxValue(12);
+        hourPicker.setMaxValue(2);
         minutePicker.setMinValue(0);
         minutePicker.setMaxValue(59);
     }
@@ -62,38 +96,19 @@ public class FocusFragment extends Fragment {
         btnStartFocus.setOnClickListener(v -> startFocusMode());
     }
 
+    // 在 FocusFragment.java 中添加/更新以下方法
     private void startFocusMode() {
         int hours = hourPicker.getValue();
         int minutes = minutePicker.getValue();
         int totalMinutes = hours * 60 + minutes;
 
         if (totalMinutes > 0) {
-            if (devicePolicyManager.isAdminActive(adminComponent)) {
-                // 启动专注模式服务
-                Intent serviceIntent = new Intent(getActivity(), FocusModeService.class);
-                serviceIntent.putExtra("duration_minutes", totalMinutes);
-                getActivity().startService(serviceIntent);
-
-                // 锁定设备
-                devicePolicyManager.lockNow();
-            } else {
-                showAdminPermissionDialog();
-            }
+            Intent intent = new Intent(getActivity(), FocusLockActivity.class);
+            intent.putExtra("minutes", totalMinutes);
+            startActivity(intent);
         }
     }
 
-    private void showAdminPermissionDialog() {
-        new MaterialAlertDialogBuilder(getContext())
-                .setTitle("设备管理员权限")
-                .setMessage("需要设备管理员权限来启用专注模式")
-                .setPositiveButton("授权", (dialog, which) -> requestAdminPermission())
-                .setNegativeButton("取消", null)
-                .show();
-    }
 
-    private void requestAdminPermission() {
-        Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
-        intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
-        startActivity(intent);
-    }
+
 }

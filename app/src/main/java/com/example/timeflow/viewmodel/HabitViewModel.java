@@ -12,8 +12,8 @@ import com.example.timeflow.repository.HabitRepository;
 import java.util.List;
 
 public class HabitViewModel extends AndroidViewModel {
-    private HabitRepository repository;
-    private LiveData<List<Habit>> allHabits;
+    private final HabitRepository repository;
+    private final LiveData<List<Habit>> allHabits;
 
     public HabitViewModel(@NonNull Application application) {
         super(application);

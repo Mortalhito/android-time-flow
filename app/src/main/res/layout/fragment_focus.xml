@@ -1,71 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="32dp">
+    android:background="@color/white">
 
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/focus_mode"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        android:layout_marginBottom="48dp" />
+        android:padding="24dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_alignParentStart="true">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="专注"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#333333" />
+
+            <TextView
+                android:id="@+id/tvTodayTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="今日总专注时间：0 分钟"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"
+                android:textColor="#666666" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layoutTopActions"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal">
+        </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:gravity="center"
-        android:layout_marginBottom="32dp">
+        android:orientation="vertical"
+        android:padding="32dp">
 
-        <NumberPicker
-            android:id="@+id/hourPicker"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="48dp">
+
+            <NumberPicker
+                android:id="@+id/hourPicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="小时"
+                android:textSize="16sp"
+                android:layout_marginHorizontal="12dp" />
+
+            <NumberPicker
+                android:id="@+id/minutePicker"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="分钟"
+                android:textSize="16sp"
+                android:layout_marginStart="12dp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnStartFocus"
+            android:layout_width="220dp"
+            android:layout_height="64dp"
+            android:text="开始专注"
+            android:textSize="18sp"
+            android:backgroundTint="#FF4081"
+            android:textColor="@color/white"
+            app:cornerRadius="32dp" />
 
         <TextView
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hours"
-            android:textSize="16sp"
-            android:layout_marginHorizontal="16dp" />
-
-        <NumberPicker
-            android:id="@+id/minutePicker"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/minutes"
-            android:textSize="16sp"
-            android:layout_marginStart="16dp" />
-
+            android:text="专注期间将锁定手机，助你保持高效"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:layout_marginTop="32dp"
+            android:textColor="#999999" />
     </LinearLayout>
-
-    <Button
-        android:id="@+id/btnStartFocus"
-        android:layout_width="200dp"
-        android:layout_height="60dp"
-        android:text="@string/start_focus"
-        android:textSize="18sp"
-        android:backgroundTint="#FF4081"
-        android:textColor="@color/white" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/focus_description"
-        android:textSize="14sp"
-        android:gravity="center"
-        android:layout_marginTop="32dp"
-        android:textColor="#666" />
 
 </LinearLayout>

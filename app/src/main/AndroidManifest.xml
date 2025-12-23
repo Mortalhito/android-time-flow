@@ -35,6 +35,15 @@
         <!-- 专注模式服务 -->
         <service android:name=".service.FocusModeService" />
 
+        <activity
+            android:name=".ui.FocusLockActivity"
+            android:theme="@style/Theme.FocusLock"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.example.timeflow.focus"
+            android:excludeFromRecents="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|keyboardHidden|screenSize" />
+
         <!-- 设备管理员接收器 -->
         <receiver
             android:name=".service.FocusDeviceAdminReceiver"
