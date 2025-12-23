@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CompactOutlinedButton" parent="Widget.Material3.Button.OutlinedButton">
+        <!-- 原有属性保持不变 -->
+        <item name="cornerRadius">4dp</item>
+        <item name="android:paddingStart">4dp</item>
+        <item name="android:paddingEnd">4dp</item>
+        <item name="android:paddingTop">2dp</item>
+        <item name="android:paddingBottom">2dp</item>
+        <item name="android:textSize">12sp</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">32dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+
+        <!-- 新增：去除文本内边距 -->
+        <item name="android:paddingLeft">0dp</item>
+        <item name="android:paddingRight">0dp</item>
+        <item name="android:paddingHorizontal">0dp</item>
+        <item name="android:drawablePadding">0dp</item>
+
+        <!-- 或者更彻底的方式 -->
+        <item name="android:padding">0dp</item>
+    </style>
+</resources>

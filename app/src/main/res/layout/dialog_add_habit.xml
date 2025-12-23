@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="16dp">
@@ -9,107 +10,374 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <!-- 标题输入框 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:hintEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etHabitTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="输入你想要坚持的目标"
+                android:maxLines="1" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 图标选择区域 -->
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="添加打卡任务"
-            android:textSize="20sp"
+            android:text="选择图标"
+            android:textSize="16sp"
             android:textStyle="bold"
-            android:layout_marginBottom="16dp" />
-
-        <!-- 任务名称 -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etHabitName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="任务名称" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- 频次选择 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="频次"
-            android:textSize="16sp"
             android:layout_marginBottom="8dp" />
 
-        <LinearLayout
-            android:id="@+id/weekDayContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp">
-
-            <!-- 周日到周六的按钮将通过代码动态添加 -->
-
-        </LinearLayout>
-
-        <!-- 每日目标次数 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="每日目标次数"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etDailyCount"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="1"
-                android:hint="每天完成次数" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- 开始时间 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="开始时间"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
-
-        <Button
-            android:id="@+id/btnStartDate"
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="选择开始时间" />
+            android:scrollbars="none">
 
-        <!-- 结束时间 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="结束时间（可选）"
-            android:textSize="16sp"
-            android:layout_marginBottom="8dp" />
+            <LinearLayout
+                android:id="@+id/iconContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btnEndDate"
+                <!-- 图标将通过代码动态添加 -->
+                <!-- 示例图标布局 -->
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_margin="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/icon"
+                    android:padding="8dp" />
+
+                <!-- 可以添加更多图标 -->
+
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <!-- 重复周期盒子 -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="选择结束时间" />
+            app:cardCornerRadius="0dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
-        <CheckBox
-            android:id="@+id/cbNoEndDate"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="4dp">
+
+                <!-- 标题行 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2"
+                        android:text="重复周期"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/repeat_toggle_group"
+                        android:layout_width="0dp"
+                        android:layout_weight="6"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="2dp"
+
+                        app:singleSelection="true"
+                        app:selectionRequired="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWeeklyFixed"
+                            style="@style/CompactOutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="2dp"
+                            android:layout_weight="1"
+                            android:text="周定期"
+                            app:strokeColor="@color/design_default_color_primary"
+                            app:strokeWidth="1dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnWeeklyRandom"
+                            style="@style/CompactOutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="2dp"
+                            android:layout_weight="1"
+                            android:text="周随机"
+                            app:strokeColor="@color/design_default_color_primary"
+                            app:strokeWidth="1dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMonthlyFixed"
+                            style="@style/CompactOutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="月定期"
+                            android:layout_marginEnd="2dp"
+                            app:strokeColor="@color/design_default_color_primary"
+                            app:strokeWidth="1dp" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnMonthlyRandom"
+                            style="@style/CompactOutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="月随机"
+                            app:strokeColor="@color/design_default_color_primary"
+                            app:strokeWidth="1dp" />
+
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                </LinearLayout>
+
+                <!-- 内容区域 - 根据选择显示不同内容 -->
+                <FrameLayout
+                    android:id="@+id/repeatContentContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <!-- 周定期布局 -->
+                    <LinearLayout
+                        android:id="@+id/layoutWeeklyFixed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="选择每周重复的日期"
+                            android:layout_marginBottom="8dp" />
+
+                        <LinearLayout
+                            android:id="@+id/weekDayContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- 星期选择按钮将通过代码动态添加 -->
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- 周随机布局 -->
+                    <LinearLayout
+                        android:id="@+id/layoutWeeklyRandom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="每周完成次数"
+                            android:layout_marginBottom="8dp" />
+
+                        <NumberPicker
+                            android:id="@+id/npWeeklyCount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                    <!-- 月定期布局 -->
+                    <LinearLayout
+                        android:id="@+id/layoutMonthlyFixed"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="选择每月重复的日期"
+                            android:layout_marginBottom="8dp" />
+
+                        <LinearLayout
+                            android:id="@+id/monthDayContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <!-- 月份日期选择将通过代码动态添加 -->
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- 月随机布局 -->
+                    <LinearLayout
+                        android:id="@+id/layoutMonthlyRandom"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="每月完成次数"
+                            android:layout_marginBottom="8dp" />
+
+                        <NumberPicker
+                            android:id="@+id/npMonthlyCount"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                    </LinearLayout>
+
+                </FrameLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- 目标时间盒子 -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="无限期目标"
-            android:layout_marginBottom="16dp" />
+            android:layout_marginBottom="16dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="目标时间"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- 开始和结束时间 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginEnd="8dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="开始时间"
+                            android:layout_marginBottom="4dp" />
+
+                        <Button
+                            android:id="@+id/btnStartDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="选择开始时间" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_marginStart="8dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="结束时间"
+                            android:layout_marginBottom="4dp" />
+
+                        <Button
+                            android:id="@+id/btnEndDate"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="选择结束时间" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- 无限期目标复选框 -->
+                <CheckBox
+                    android:id="@+id/cb_no_end_date"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="无限期目标"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- 每日完成次数 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="每日完成次数"
+                        android:layout_marginBottom="8dp" />
+
+                    <NumberPicker
+                        android:id="@+id/npDailyCount"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- 鼓励话语输入框 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:hintEnabled="true">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEncouragement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="写一句鼓励自己的话吧~"
+                android:maxLines="3"
+                android:inputType="textMultiLine" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 按钮区域 -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
