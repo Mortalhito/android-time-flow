@@ -1,9 +1,9 @@
-package com.example.timeflow.dao;
+package com.example.timeflow.room.dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import com.example.timeflow.entity.FocusRecord;
+import com.example.timeflow.room.entity.FocusRecord;
 import java.util.List;
 
 @Dao

@@ -9,49 +9,53 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- 使用自定义的CircleImageView -->
+        <!-- 头像 -->
         <com.example.timeflow.view.CircleImageView
             android:id="@+id/ivAvatar"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:src="@android:drawable/ic_menu_gallery"
             android:layout_gravity="center_horizontal"
-            android:background="#f0f0f0"
-            android:layout_marginBottom="24dp" />
+            android:src="@drawable/default_avatar"
+            android:layout_marginBottom="12dp" />
 
+        <!-- 用户名 / 登录提示 -->
         <TextView
             android:id="@+id/tvUserName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/user_name"
-            android:textSize="24sp"
-            android:textStyle="bold"
+            android:text="点击头像登录"
+            android:textSize="18sp"
             android:gravity="center"
-            android:layout_marginBottom="8dp" />
+            android:textColor="#666"
+            android:layout_marginBottom="4dp" />
 
+        <!-- 邮箱（登录后才显示） -->
         <TextView
             android:id="@+id/tvUserEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/user_email"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:gravity="center"
-            android:layout_marginBottom="32dp"
-            android:textColor="#666" />
+            android:textColor="#888"
+            android:visibility="gone"
+            android:layout_marginBottom="24dp" />
 
+        <!-- 统计卡片（登录后显示） -->
         <LinearLayout
+            android:id="@+id/layoutStats"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginBottom="16dp"
             android:background="@drawable/card_background"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone">
 
             <TextView
                 android:id="@+id/tvFocusStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/total_focus_time"
+                android:text="总专注时间：0 小时"
                 android:textSize="16sp"
                 android:layout_marginBottom="8dp" />
 
@@ -59,35 +63,38 @@
                 android:id="@+id/tvHabitStats"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/habit_completion_rate"
+                android:text="习惯完成率：0%"
                 android:textSize="16sp" />
-
         </LinearLayout>
 
+        <!-- 编辑资料 -->
         <Button
             android:id="@+id/btnEditProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/edit_profile"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="@color/black" />
+            android:text="编辑个人资料"
+            android:backgroundTint="@color/black"
+            android:visibility="gone" />
 
+        <!-- 设置 -->
         <Button
             android:id="@+id/btnSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/settings"
+            android:text="设置"
             android:layout_marginTop="8dp"
-            android:backgroundTint="#666" />
+            android:backgroundTint="#666"
+            android:visibility="gone" />
 
+        <!-- 退出登录 -->
         <Button
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/logout"
+            android:text="退出登录"
             android:layout_marginTop="8dp"
-            android:backgroundTint="@color/red" />
+            android:backgroundTint="@color/red"
+            android:visibility="gone" />
 
     </LinearLayout>
-
 </ScrollView>

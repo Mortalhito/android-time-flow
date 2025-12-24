@@ -1,5 +1,5 @@
 // Category.java
-package com.example.timeflow.entity;
+package com.example.timeflow.room.entity;
 
 public class Category {
     private int id;

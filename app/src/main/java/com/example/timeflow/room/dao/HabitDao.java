@@ -1,4 +1,4 @@
-package com.example.timeflow.dao;
+package com.example.timeflow.room.dao;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
@@ -7,7 +7,7 @@ import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.example.timeflow.entity.Habit;
+import com.example.timeflow.room.entity.Habit;
 
 import java.util.List;
 

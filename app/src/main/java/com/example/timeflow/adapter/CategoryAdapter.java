@@ -13,8 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timeflow.R;
-import com.example.timeflow.database.DatabaseHelper;
-import com.example.timeflow.entity.Category;
+import com.example.timeflow.room.database.DatabaseHelper;
+import com.example.timeflow.room.entity.Category;
 
 import java.util.List;
 

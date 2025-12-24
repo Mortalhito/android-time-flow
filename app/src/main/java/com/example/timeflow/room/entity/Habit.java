@@ -1,4 +1,4 @@
-package com.example.timeflow.entity;
+package com.example.timeflow.room.entity;
 
 import androidx.room.Entity;
 import androidx.room.Ignore;

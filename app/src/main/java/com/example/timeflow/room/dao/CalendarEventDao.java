@@ -1,7 +1,7 @@
-package com.example.timeflow.dao;
+package com.example.timeflow.room.dao;
 
 import androidx.room.*;
-import com.example.timeflow.entity.CalendarEvent;
+import com.example.timeflow.room.entity.CalendarEvent;
 
 import java.util.List;
 

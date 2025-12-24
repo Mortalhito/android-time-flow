@@ -2,9 +2,9 @@ package com.example.timeflow.repository;
 
 import android.content.Context;
 
-import com.example.timeflow.database.AppDatabase;
-import com.example.timeflow.dao.CalendarEventDao;
-import com.example.timeflow.entity.CalendarEvent;
+import com.example.timeflow.room.database.AppDatabase;
+import com.example.timeflow.room.dao.CalendarEventDao;
+import com.example.timeflow.room.entity.CalendarEvent;
 
 import java.util.List;
 import java.util.concurrent.Executor;

@@ -20,6 +20,7 @@ materialVersion = "1.4.0"
 navigationFragment = "2.4.2"
 navigationUi = "2.9.6"
 navigationUiVersion = "2.4.2"
+datastoreCoreAndroid = "1.2.0"
 
 [libraries]
 appcompat-v140 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
@@ -43,6 +44,7 @@ navigation-fragment = { module = "androidx.navigation:navigation-fragment", vers
 navigation-fragment-v242 = { module = "androidx.navigation:navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUi" }
 navigation-ui-v242 = { module = "androidx.navigation:navigation-ui", version.ref = "navigationUiVersion" }
+datastore-core-android = { group = "androidx.datastore", name = "datastore-core-android", version.ref = "datastoreCoreAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

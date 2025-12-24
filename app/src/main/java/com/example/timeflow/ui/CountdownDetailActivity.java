@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.timeflow.R;
-import com.example.timeflow.database.DatabaseHelper;
-import com.example.timeflow.entity.CountdownEvent;
+import com.example.timeflow.room.database.DatabaseHelper;
+import com.example.timeflow.room.entity.CountdownEvent;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

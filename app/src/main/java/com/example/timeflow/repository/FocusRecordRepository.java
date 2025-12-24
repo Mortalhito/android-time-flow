@@ -2,9 +2,9 @@ package com.example.timeflow.repository;
 
 import android.app.Application;
 
-import com.example.timeflow.dao.FocusRecordDao;
-import com.example.timeflow.database.AppDatabase;
-import com.example.timeflow.entity.FocusRecord;
+import com.example.timeflow.room.dao.FocusRecordDao;
+import com.example.timeflow.room.database.AppDatabase;
+import com.example.timeflow.room.entity.FocusRecord;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

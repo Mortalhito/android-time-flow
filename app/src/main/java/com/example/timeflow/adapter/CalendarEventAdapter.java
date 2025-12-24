@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timeflow.R;
-import com.example.timeflow.entity.CalendarEvent;
+import com.example.timeflow.room.entity.CalendarEvent;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.example.timeflow.database;
+package com.example.timeflow.room.database;
 
 import android.content.Context;
 
@@ -7,15 +7,17 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
-import com.example.timeflow.dao.CalendarEventDao;
-import com.example.timeflow.dao.FocusRecordDao;
-import com.example.timeflow.dao.HabitDao;
-import com.example.timeflow.entity.CalendarEvent;
-import com.example.timeflow.entity.FocusRecord;
-import com.example.timeflow.entity.Habit;
+import com.example.timeflow.room.dao.CalendarEventDao;
+import com.example.timeflow.room.dao.FocusRecordDao;
+import com.example.timeflow.room.dao.HabitDao;
+import com.example.timeflow.room.dao.UserDao;
+import com.example.timeflow.room.entity.CalendarEvent;
+import com.example.timeflow.room.entity.FocusRecord;
+import com.example.timeflow.room.entity.Habit;
+import com.example.timeflow.room.entity.User;
 import com.example.timeflow.utils.Converters;
 
-@Database(entities = {CalendarEvent.class, Habit.class, FocusRecord.class}, version = 1, exportSchema = false)
+@Database(entities = {CalendarEvent.class, Habit.class, FocusRecord.class, User.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;
@@ -23,7 +25,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract CalendarEventDao calendarEventDao();
     public abstract HabitDao habitDao();
     public abstract FocusRecordDao focusRecordDao();
-    
+    public abstract UserDao userDao();
+
     public static AppDatabase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDatabase.class) {

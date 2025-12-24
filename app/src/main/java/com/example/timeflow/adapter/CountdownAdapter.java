@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timeflow.R;
-import com.example.timeflow.entity.CountdownEvent;
+import com.example.timeflow.room.entity.CountdownEvent;
 import com.example.timeflow.ui.CountdownDetailActivity;
 
 import java.util.Collections;

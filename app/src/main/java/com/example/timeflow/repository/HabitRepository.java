@@ -3,9 +3,9 @@ package com.example.timeflow.repository;
 import android.app.Application;
 import androidx.lifecycle.LiveData;
 
-import com.example.timeflow.dao.HabitDao;
-import com.example.timeflow.database.AppDatabase;
-import com.example.timeflow.entity.Habit;
+import com.example.timeflow.room.dao.HabitDao;
+import com.example.timeflow.room.database.AppDatabase;
+import com.example.timeflow.room.entity.Habit;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;

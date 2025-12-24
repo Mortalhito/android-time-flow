@@ -1,5 +1,5 @@
 // DatabaseHelper.java
-package com.example.timeflow.database;
+package com.example.timeflow.room.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,8 +7,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.timeflow.entity.Category;
-import com.example.timeflow.entity.CountdownEvent;
+import com.example.timeflow.room.entity.Category;
+import com.example.timeflow.room.entity.CountdownEvent;
 
 import java.util.ArrayList;
 import java.util.List;

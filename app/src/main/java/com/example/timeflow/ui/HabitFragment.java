@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.timeflow.R;
 import com.example.timeflow.adapter.HabitAdapter;
-import com.example.timeflow.entity.Habit;
+import com.example.timeflow.room.entity.Habit;
 import com.example.timeflow.viewmodel.HabitViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.button.MaterialButtonToggleGroup;

@@ -1,34 +1,40 @@
 package com.example.timeflow.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.example.timeflow.R;
-import com.example.timeflow.utils.SharedPreferencesManager;
+import com.example.timeflow.room.entity.User;
 import com.example.timeflow.view.CircleImageView;
+import com.example.timeflow.viewmodel.ProfileViewModel;
 
 public class ProfileFragment extends Fragment {
 
     private CircleImageView ivAvatar;
     private TextView tvUserName, tvUserEmail, tvFocusStats, tvHabitStats;
-    private SharedPreferencesManager prefsManager;
-    private View rootView; // 添加成员变量保存view
+    private View layoutStats, btnEdit, btnSettings, btnLogout;
 
-    public ProfileFragment() {}
+    private ProfileViewModel viewModel;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.fragment_profile, container, false); // 保存到成员变量
 
-        initViews(rootView);
-        loadUserData();
-        setClickListeners();
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
-        return rootView;
+        initViews(view);
+        observeUser();
+        setupActions();
+
+        return view;
     }
 
     private void initViews(View view) {
@@ -37,69 +43,61 @@ public class ProfileFragment extends Fragment {
         tvUserEmail = view.findViewById(R.id.tvUserEmail);
         tvFocusStats = view.findViewById(R.id.tvFocusStats);
         tvHabitStats = view.findViewById(R.id.tvHabitStats);
-        prefsManager = new SharedPreferencesManager(getContext());
+
+        layoutStats = view.findViewById(R.id.layoutStats);
+        btnEdit = view.findViewById(R.id.btnEditProfile);
+        btnSettings = view.findViewById(R.id.btnSettings);
+        btnLogout = view.findViewById(R.id.btnLogout);
+
+        viewModel = new ViewModelProvider(this).get(ProfileViewModel.class);
     }
 
-    private void loadUserData() {
-        // 从SharedPreferences加载用户数据
-        tvUserName.setText(prefsManager.getUserName());
-        tvUserEmail.setText(prefsManager.getUserEmail());
-
-        // 计算统计数据
-        long totalFocusMinutes = prefsManager.getTotalFocusTime();
-        long totalFocusHours = totalFocusMinutes / 60;
-        tvFocusStats.setText("总专注时间: " + totalFocusHours + "小时");
-
-        // 计算习惯完成率
-        float habitCompletionRate = calculateHabitCompletionRate();
-        tvHabitStats.setText("习惯完成率: " + String.format("%.0f", habitCompletionRate) + "%");
+    private void observeUser() {
+        viewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+            if (user == null) {
+                showNotLoginUI();
+            } else {
+                showLoginUI(user);
+            }
+        });
     }
 
-    private float calculateHabitCompletionRate() {
-        // 这里计算所有习惯的平均完成率
-        // 简化实现，实际应该从数据库计算
-        return 75.0f; // 示例值
+    private void showNotLoginUI() {
+        ivAvatar.setImageResource(R.drawable.default_avatar);
+        tvUserName.setText("点击头像登录");
+        tvUserEmail.setVisibility(View.GONE);
+
+        layoutStats.setVisibility(View.GONE);
+        btnEdit.setVisibility(View.GONE);
+        btnSettings.setVisibility(View.GONE);
+        btnLogout.setVisibility(View.GONE);
+
+        ivAvatar.setOnClickListener(v ->
+                startActivity(new Intent(getContext(), LoginActivity.class))
+        );
     }
 
-    private void setClickListeners() {
-        // 头像点击事件
-        ivAvatar.setOnClickListener(v -> changeAvatar());
+    private void showLoginUI(User user) {
+        tvUserName.setText(user.username);
+        tvUserEmail.setText(user.email);
+        tvUserEmail.setVisibility(View.VISIBLE);
 
-        // 编辑个人信息按钮 - 使用rootView
-        rootView.findViewById(R.id.btnEditProfile).setOnClickListener(v -> editProfile());
+        layoutStats.setVisibility(View.VISIBLE);
+        btnEdit.setVisibility(View.VISIBLE);
+        btnSettings.setVisibility(View.VISIBLE);
+        btnLogout.setVisibility(View.VISIBLE);
 
-        // 设置按钮 - 使用rootView
-        rootView.findViewById(R.id.btnSettings).setOnClickListener(v -> openSettings());
-
-        // 退出登录按钮 - 使用rootView
-        rootView.findViewById(R.id.btnLogout).setOnClickListener(v -> logout());
+        tvFocusStats.setText("总专注时间：12 小时");
+        tvHabitStats.setText("习惯完成率：75%");
     }
 
-    private void changeAvatar() {
-        // 更换头像的逻辑
-        android.widget.Toast.makeText(getContext(), "更换头像功能开发中", android.widget.Toast.LENGTH_SHORT).show();
-    }
-
-    private void editProfile() {
-        // 编辑个人信息的逻辑
-        android.widget.Toast.makeText(getContext(), "编辑个人信息功能开发中", android.widget.Toast.LENGTH_SHORT).show();
-    }
-
-    private void openSettings() {
-        // 打开设置的逻辑
-        android.widget.Toast.makeText(getContext(), "设置功能开发中", android.widget.Toast.LENGTH_SHORT).show();
-    }
-
-    private void logout() {
-        // 退出登录的逻辑
-        new android.app.AlertDialog.Builder(getContext())
-                .setTitle("确认退出")
-                .setMessage("您确定要退出登录吗？")
-                .setPositiveButton("确定", (dialog, which) -> {
-                    // 执行退出登录操作
-                    android.widget.Toast.makeText(getContext(), "已退出登录", android.widget.Toast.LENGTH_SHORT).show();
-                })
-                .setNegativeButton("取消", null)
-                .show();
+    private void setupActions() {
+        btnLogout.setOnClickListener(v ->
+                viewModel.logout(() ->
+                        requireActivity().runOnUiThread(() ->
+                                Toast.makeText(getContext(), "已退出登录", Toast.LENGTH_SHORT).show()
+                        )
+                )
+        );
     }
 }

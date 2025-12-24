@@ -1,4 +1,4 @@
-package com.example.timeflow.entity;
+package com.example.timeflow.room.entity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

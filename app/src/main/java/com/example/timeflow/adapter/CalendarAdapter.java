@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.example.timeflow.R;
 import com.example.timeflow.view.CustomCalendarView;
-import com.example.timeflow.entity.CalendarEvent;
+import com.example.timeflow.room.entity.CalendarEvent;
 
 import java.util.Calendar;
 import java.util.List;
