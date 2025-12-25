@@ -32,4 +32,10 @@
     <color name="orange_500">#FF9800</color>
     <color name="orange_200">#FFCC80</color>
     <color name="gray_200">#EEEEEE</color>
+
+
+    <color name="Primary">#3F51B5</color>
+    <color name="Primary_Dark">#303F9F</color>
+    <color name="accent">#FFC107</color>
+    
 </resources>

@@ -4,6 +4,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import androidx.room.RoomWarnings;
+import androidx.room.Update;
 
 import com.example.timeflow.room.entity.CountdownEvent;
 import java.util.List;
@@ -12,6 +13,9 @@ import java.util.List;
 public interface CountdownEventDao {
     @Insert
     void insert(CountdownEvent event);
+
+    @Update
+    void update(CountdownEvent event);
 
     @Query("DELETE FROM countdown_events WHERE id = :eventId")
     void deleteById(String eventId);

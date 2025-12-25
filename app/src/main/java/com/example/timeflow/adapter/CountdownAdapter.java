@@ -17,7 +17,6 @@ import com.example.timeflow.room.entity.CountdownEvent;
 import com.example.timeflow.ui.CountdownDetailActivity;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.ViewHolder> {
@@ -47,25 +46,22 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
             event.getDaysLeft(); // 这会触发重新计算
         }
 
-        Collections.sort(newList, new Comparator<CountdownEvent>() {
-            @Override
-            public int compare(CountdownEvent event1, CountdownEvent event2) {
-                // 未来事件优先于过去事件
-                if (!event1.isPast() && event2.isPast()) {
-                    return -1;
-                }
-                if (event1.isPast() && !event2.isPast()) {
-                    return 1;
-                }
+        Collections.sort(newList, (event1, event2) -> {
+            // 未来事件优先于过去事件
+            if (!event1.isPast() && event2.isPast()) {
+                return -1;
+            }
+            if (event1.isPast() && !event2.isPast()) {
+                return 1;
+            }
 
-                // 相同类型的事件比较
-                if (!event1.isPast()) {
-                    // 都是未来事件：天数少的排在前面
-                    return event1.getDaysLeft() - event2.getDaysLeft();
-                } else {
-                    // 都是过去事件：天数绝对值大的排在后面（离现在更远的排在后面）
-                    return Math.abs(event1.getDaysLeft()) - Math.abs(event2.getDaysLeft());
-                }
+            // 相同类型的事件比较
+            if (!event1.isPast()) {
+                // 都是未来事件：天数少的排在前面
+                return event1.getDaysLeft() - event2.getDaysLeft();
+            } else {
+                // 都是过去事件：天数绝对值大的排在后面（离现在更远的排在后面）
+                return Math.abs(event1.getDaysLeft()) - Math.abs(event2.getDaysLeft());
             }
         });
 

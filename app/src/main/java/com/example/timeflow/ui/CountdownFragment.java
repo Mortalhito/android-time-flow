@@ -2,15 +2,18 @@ package com.example.timeflow.ui;
 
 import android.app.DatePickerDialog;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -58,6 +61,33 @@ public class CountdownFragment extends Fragment {
         view.findViewById(R.id.btnAddEvent).setOnClickListener(v -> showAddEventDialog());
 
         initData();
+
+        adapter.setOnItemClickListener(new CountdownAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(CountdownEvent event) {
+                // 已有点击逻辑（跳转详情），保持不变
+            }
+
+            @Override
+            public void onItemLongClick(CountdownEvent event) {
+                // 新增：弹出确认删除对话框
+                new android.app.AlertDialog.Builder(requireContext())
+                        .setTitle("删除倒数日")
+                        .setMessage("确定删除 \"" + event.getName() + "\" 吗？")
+                        .setPositiveButton("删除", (d, w) -> {
+                            AppDatabase.databaseWriteExecutor.execute(() -> {
+                                db.eventDao().deleteById(event.getId());
+                                requireActivity().runOnUiThread(() -> {
+                                    eventList.remove(event);
+                                    adapter.notifyDataSetChanged();
+                                    Toast.makeText(requireContext(), "删除成功", Toast.LENGTH_SHORT).show();
+                                });
+                            });
+                        })
+                        .setNegativeButton("取消", null)
+                        .show();
+            }
+        });
         return view;
     }
 
@@ -81,57 +111,114 @@ public class CountdownFragment extends Fragment {
     }
 
     private void showAddEventDialog() {
-        // 使用你的布局文件 dialog_add_countdown.xml
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.dialog_add_countdown, null);
 
         TextInputEditText etName = view.findViewById(R.id.etEventName);
         TextInputEditText etDate = view.findViewById(R.id.etEventDate);
         LinearLayout categoryContainer = view.findViewById(R.id.categoryContainer);
+        Button btnConfirm = view.findViewById(R.id.btnConfirm);
+        View btnManageCategories = view.findViewById(R.id.btnManageCategories);
 
         etDate.setOnClickListener(v -> showDatePicker(etDate));
 
-        // 1. 实现单选：清除容器并添加一个 RadioGroup
+        // 用于记录用户选中的分类 ID，初始为 -1（未选中）
+        final int[] selectedCategoryId = {-1};
+
+        // 创建 RadioGroup 作为容器
         categoryContainer.removeAllViews();
         RadioGroup radioGroup = new RadioGroup(getContext());
         radioGroup.setOrientation(RadioGroup.VERTICAL);
         categoryContainer.addView(radioGroup);
 
-        // 动态生成单选按钮
-        for (Category category : categoryList) {
-            RadioButton rb = new RadioButton(getContext());
-            rb.setText(category.getName());
-            rb.setTag(category.getId()); // 将分类ID存在Tag里
-            rb.setId(View.generateViewId()); // 必须生成ID，RadioGroup才能控制互斥
-            radioGroup.addView(rb);
-        }
+        // 加载所有分类
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            List<Category> categories = db.categoryDao().getAllCategories();
+            requireActivity().runOnUiThread(() -> {
+                radioGroup.removeAllViews();
 
-        // ID 对齐：btnConfirm
-        view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-            String name = etName.getText().toString();
-            String date = etDate.getText().toString();
+                if (categories.isEmpty()) {
+                    TextView tvEmpty = new TextView(getContext());
+                    tvEmpty.setText("暂无分类，请先添加");
+                    tvEmpty.setPadding(0, 40, 0, 40);
+                    tvEmpty.setGravity(android.view.Gravity.CENTER);
+                    tvEmpty.setTextColor(Color.GRAY);
+                    radioGroup.addView(tvEmpty);
+                    btnConfirm.setEnabled(false); // 没有分类就禁用确定按钮
+                    return;
+                }
 
-            // 获取选中的 RadioButton
-            int checkedId = radioGroup.getCheckedRadioButtonId();
-            if (!name.isEmpty() && !date.isEmpty() && checkedId != -1) {
-                RadioButton selectedRb = radioGroup.findViewById(checkedId);
-                int catId = (int) selectedRb.getTag();
+                for (Category category : categories) {
+                    View itemView = getLayoutInflater().inflate(R.layout.item_category_select_radio, radioGroup, false);
 
-                AppDatabase.databaseWriteExecutor.execute(() -> {
-                    // 插入数据库
-                    db.eventDao().insert(new CountdownEvent(name, catId, date));
-                    // 刷新主页列表
-                    initData();
-                });
-                dialog.dismiss();
-            } else {
-                Toast.makeText(getContext(), "请填写完整并选择一个分类", Toast.LENGTH_SHORT).show();
-            }
+                    RadioButton rb = itemView.findViewById(R.id.radioButton);
+                    View colorView = itemView.findViewById(R.id.tvCategoryColor);
+                    TextView tvName = itemView.findViewById(R.id.tvCategoryName);
+
+                    tvName.setText(category.getName());
+
+                    // 设置颜色块（方形带小圆角）
+                    GradientDrawable drawable = (GradientDrawable) colorView.getBackground().mutate();
+                    drawable.setColor(category.getColor());
+                    colorView.setBackground(drawable);
+
+                    // 点击整行实现手动单选
+                    itemView.setOnClickListener(v -> {
+                        // 先取消所有其他选中
+                        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+                            View child = radioGroup.getChildAt(i);
+                            RadioButton childRb = child.findViewById(R.id.radioButton);
+                            if (childRb != null) {
+                                childRb.setChecked(false);
+                            }
+                        }
+                        // 选中当前
+                        rb.setChecked(true);
+                        selectedCategoryId[0] = category.getId();
+                    });
+
+                    radioGroup.addView(itemView);
+                }
+            });
         });
 
-        view.findViewById(R.id.btnManageCategories).setOnClickListener(v -> {
+        // 管理分类按钮
+        btnManageCategories.setOnClickListener(v -> {
             dialog.dismiss();
             showManageCategoriesDialog();
+        });
+
+        // 确定按钮：保存新事件
+        btnConfirm.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String date = etDate.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                Toast.makeText(getContext(), "请输入事件名称", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (date.isEmpty()) {
+                Toast.makeText(getContext(), "请选择日期", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (selectedCategoryId[0] == -1) {
+                Toast.makeText(getContext(), "请选择一个分类", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            CountdownEvent newEvent = new CountdownEvent();
+            newEvent.setName(name);
+            newEvent.setTargetDate(date);
+            newEvent.setCategoryId(selectedCategoryId[0]);
+
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                db.eventDao().insert(newEvent);
+                requireActivity().runOnUiThread(() -> {
+                    dialog.dismiss();
+                    initData(); // 刷新列表
+                    Toast.makeText(getContext(), "添加成功", Toast.LENGTH_SHORT).show();
+                });
+            });
         });
 
         dialog.setContentView(view);
