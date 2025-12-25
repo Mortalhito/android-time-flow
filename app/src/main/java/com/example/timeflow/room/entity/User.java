@@ -9,13 +9,17 @@ public class User {
 
     @PrimaryKey
     @NonNull
-    public String username;
+    private String username;
 
-    public String email;
+    private String email;
 
-    public String avatarUrl;
+    private String avatarUrl;
 
-    public String token;
+    private String token;
+
+
+    public User() {
+    }
 
     @NonNull
     public String getUsername() {
@@ -49,4 +53,14 @@ public class User {
     public void setToken(String token) {
         this.token = token;
     }
+
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    private String nickname;
 }

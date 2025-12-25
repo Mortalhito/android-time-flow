@@ -2,6 +2,8 @@ package com.example.timeflow.repository;
 
 import android.content.Context;
 
+import androidx.lifecycle.LiveData;
+
 import com.example.timeflow.api.ApiClient;
 import com.example.timeflow.api.AuthApi;
 import com.example.timeflow.room.dao.UserDao;
@@ -20,7 +22,7 @@ public class UserRepository {
         authApi = ApiClient.getInstance(context).create(AuthApi.class);
     }
 
-    public User getLocalUser() {
+    public LiveData<User> getLocalUserLive() {
         return userDao.getCurrentUser();
     }
 

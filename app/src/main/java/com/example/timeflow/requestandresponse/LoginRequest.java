@@ -1,4 +1,4 @@
-package com.example.timeflow.room.entity;
+package com.example.timeflow.requestandresponse;
 
 public class LoginRequest {
     // Getters and Setters

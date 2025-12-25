@@ -1,5 +1,6 @@
 package com.example.timeflow.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -11,9 +12,10 @@ import com.example.timeflow.api.ApiClient;
 import com.example.timeflow.api.AuthApi;
 import com.example.timeflow.room.dao.UserDao;
 import com.example.timeflow.room.database.AppDatabase;
-import com.example.timeflow.room.entity.JwtResponse;
-import com.example.timeflow.room.entity.LoginRequest;
+import com.example.timeflow.requestandresponse.JwtResponse;
+import com.example.timeflow.requestandresponse.LoginRequest;
 import com.example.timeflow.room.entity.User;
+import com.example.timeflow.ui.register.RegisterActivity;
 
 import java.util.concurrent.Executors;
 
@@ -48,12 +50,13 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setupActions() {
-
         findViewById(R.id.btnLogin).setOnClickListener(v -> login());
 
-        findViewById(R.id.btnRegister).setOnClickListener(v ->
-                Toast.makeText(this, "注册功能待实现", Toast.LENGTH_SHORT).show()
-        );
+        // 修改注册按钮功能
+        findViewById(R.id.btnRegister).setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
+        });
 
         findViewById(R.id.btnForgot).setOnClickListener(v ->
                 Toast.makeText(this, "找回密码功能待实现", Toast.LENGTH_SHORT).show()
@@ -97,9 +100,9 @@ public class LoginActivity extends AppCompatActivity {
         Executors.newSingleThreadExecutor().execute(() -> {
 
             User user = new User();
-            user.username = username;
-            user.email = ""; // 后续可从 /me 接口补全
-            user.token = token;
+            user.setUsername(username);
+            user.setEmail(""); // 后续可从 /me 接口补全
+            user.setToken(token);
 
             userDao.clear();
             userDao.saveUser(user);

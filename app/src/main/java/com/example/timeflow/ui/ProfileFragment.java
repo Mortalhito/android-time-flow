@@ -78,8 +78,8 @@ public class ProfileFragment extends Fragment {
     }
 
     private void showLoginUI(User user) {
-        tvUserName.setText(user.username);
-        tvUserEmail.setText(user.email);
+        tvUserName.setText(user.getUsername());
+        tvUserEmail.setText(user.getEmail());
         tvUserEmail.setVisibility(View.VISIBLE);
 
         layoutStats.setVisibility(View.VISIBLE);

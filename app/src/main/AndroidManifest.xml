@@ -48,6 +48,7 @@
 
 
         <activity android:name=".ui.LoginActivity"/>
+        <activity android:name=".ui.register.RegisterActivity"/>
 
         <!-- 设备管理员接收器 -->
         <receiver

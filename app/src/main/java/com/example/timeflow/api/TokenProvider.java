@@ -16,9 +16,9 @@ public class TokenProvider {
         }
 
         UserDao userDao = AppDatabase.getInstance(context).userDao();
-        User user = userDao.getCurrentUser();
+        User user = userDao.getCurrentUser().getValue();
         if (user != null) {
-            cachedToken = user.token;
+            cachedToken = user.getToken();
             return cachedToken;
         }
         return null;
