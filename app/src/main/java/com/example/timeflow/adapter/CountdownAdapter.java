@@ -84,7 +84,7 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CountdownEvent event = eventList.get(position);
 
-        holder.tvEventName.setText(event.getSafeName());
+        holder.tvEventName.setText(event.getName());
         holder.tvCategory.setText(event.getCategoryName());
         holder.tvDaysLeft.setText(event.getDisplayText());
         holder.tvTargetDate.setText(event.getTargetDate());
@@ -124,7 +124,7 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
             intent.putExtra("event_id", event.getId());
 
             // 添加调试信息到Intent
-            intent.putExtra("debug_event_name", event.getSafeName());
+            intent.putExtra("debug_event_name", event.getName());
 
             context.startActivity(intent);
         });

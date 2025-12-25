@@ -16,7 +16,7 @@ import android.widget.TextView;
 import androidx.fragment.app.Fragment;
 
 import com.example.timeflow.R;
-import com.example.timeflow.repository.FocusRecordRepository;
+import com.example.timeflow.room.repository.FocusRecordRepository;
 import com.example.timeflow.service.FocusDeviceAdminReceiver;
 
 import java.util.Date;

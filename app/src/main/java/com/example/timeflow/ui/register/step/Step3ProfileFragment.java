@@ -23,7 +23,7 @@ import com.bumptech.glide.Glide;
 import com.example.timeflow.R;
 import com.example.timeflow.api.ApiClient;
 import com.example.timeflow.api.AuthApi;
-import com.example.timeflow.datastore.TokenManager;
+import com.example.timeflow.room.datastore.TokenManager;
 import com.example.timeflow.room.dao.UserDao;
 import com.example.timeflow.room.database.AppDatabase;
 import com.example.timeflow.requestandresponse.JwtResponse;

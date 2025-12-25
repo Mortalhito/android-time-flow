@@ -1,148 +1,81 @@
 package com.example.timeflow.room.entity;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+import androidx.room.ColumnInfo;
+import androidx.room.Ignore;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+@Entity(tableName = "countdown_events")
 public class CountdownEvent {
-    private String name;
-    private String targetDate;
-    private int daysLeft;
+    @PrimaryKey
+    @NonNull
     private String id;
-    private boolean isPast;
-    private String category;
+    private String name;
+    @ColumnInfo(name = "category_id")
     private int categoryId;
+    @ColumnInfo(name = "target_date")
+    private String targetDate;
+
+    @Ignore
+    private int daysLeft;
+    @Ignore
+    private boolean isPast;
+    @Ignore
     private String categoryName;
+    @Ignore
     private int categoryColor;
 
+    @Ignore
+    public CountdownEvent() {
+        this.id = String.valueOf(System.currentTimeMillis());
+    }
+
     public CountdownEvent(String name, int categoryId, String targetDate) {
+        this.id = String.valueOf(System.currentTimeMillis());
         this.name = name;
         this.categoryId = categoryId;
         this.targetDate = targetDate;
-        this.id = String.valueOf(System.currentTimeMillis()); // 临时ID
-        calculateDaysLeft(); // 重要：必须调用！
     }
 
-    public CountdownEvent() {
-        this.id = String.valueOf(System.currentTimeMillis()); // 默认ID
-    }
-
-    // 修改 getDisplayText() 方法，确保不会返回 null
-    public String getDisplayText() {
-        calculateDaysLeft(); // 确保每次显示时都计算最新天数
-
-        int absoluteDays = Math.abs(daysLeft);
-        if (isPast) {
-            return "已经" + absoluteDays + "天";
-        } else {
-            return "还有" + absoluteDays + "天";
-        }
-    }
-
-    // 确保 calculateDaysLeft() 总是能正确计算
     public void calculateDaysLeft() {
-        if (targetDate == null || targetDate.isEmpty()) {
-            this.daysLeft = 0;
-            this.isPast = false;
-            return;
-        }
-
+        if (targetDate == null || targetDate.isEmpty()) return;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             Date target = sdf.parse(targetDate);
             Date today = new Date();
-
             long diff = target.getTime() - today.getTime();
             this.daysLeft = (int) (diff / (1000 * 60 * 60 * 24));
             this.isPast = diff < 0;
         } catch (ParseException e) {
             e.printStackTrace();
-            this.daysLeft = 0;
-            this.isPast = false;
         }
     }
 
-    // 添加一个安全的方法来获取事件名称
-    public String getSafeName() {
-        return name != null ? name : "未命名事件";
+    public String getDisplayText() {
+        calculateDaysLeft();
+        int absDays = Math.abs(daysLeft);
+        return isPast ? "已经" + absDays + "天" : "还有" + absDays + "天";
     }
 
-    // Getters and Setters 保持不变
-    public String getName() {
-        return name != null ? name : "未命名事件";
-    }
-
-    public void setName(String name) {
-        this.name = name;
-        calculateDaysLeft(); // 名称改变时重新计算
-    }
-
-    public String getTargetDate() {
-        return targetDate != null ? targetDate : "";
-    }
-
-    public void setTargetDate(String targetDate) {
-        this.targetDate = targetDate;
-        calculateDaysLeft(); // 日期改变时重新计算
-    }
-
-    // 其他 getter/setter 方法保持不变...
-    public int getDaysLeft() {
-        calculateDaysLeft(); // 确保返回最新值
-        return daysLeft;
-    }
-
-    public void setDaysLeft(int daysLeft) {
-        this.daysLeft = daysLeft;
-    }
-
-    public String getId() {
-        return id != null ? id : String.valueOf(System.currentTimeMillis());
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean isPast() {
-        calculateDaysLeft(); // 确保返回最新值
-        return isPast;
-    }
-
-    public void setPast(boolean past) {
-        isPast = past;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public String getCategoryName() {
-        return categoryName != null ? categoryName : "未分类";
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public String getCategory() {
-        return category != null ? category : "未分类";
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public int getCategoryColor() {
-        return categoryColor;
-    }
-
-    public void setCategoryColor(int categoryColor) {
-        this.categoryColor = categoryColor;
-    }
+    @NonNull public String getId() { return id; }
+    public void setId(@NonNull String id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public int getCategoryId() { return categoryId; }
+    public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
+    public String getTargetDate() { return targetDate; }
+    public void setTargetDate(String targetDate) { this.targetDate = targetDate; }
+    public int getDaysLeft() { return daysLeft; }
+    public void setDaysLeft(int daysLeft) { this.daysLeft = daysLeft; }
+    public boolean isPast() { return isPast; }
+    public void setPast(boolean past) { isPast = past; }
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public int getCategoryColor() { return categoryColor; }
+    public void setCategoryColor(int categoryColor) { this.categoryColor = categoryColor; }
 }

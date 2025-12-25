@@ -13,7 +13,7 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.timeflow.R;
-import com.example.timeflow.repository.FocusRecordRepository;
+import com.example.timeflow.room.repository.FocusRecordRepository;
 import com.example.timeflow.view.FocusProgressView;
 
 public class FocusLockActivity extends AppCompatActivity {

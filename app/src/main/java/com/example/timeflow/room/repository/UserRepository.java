@@ -1,4 +1,4 @@
-package com.example.timeflow.repository;
+package com.example.timeflow.room.repository;
 
 import android.content.Context;
 

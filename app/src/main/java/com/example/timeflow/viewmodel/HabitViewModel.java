@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
 import com.example.timeflow.room.entity.Habit;
-import com.example.timeflow.repository.HabitRepository;
+import com.example.timeflow.room.repository.HabitRepository;
 
 import java.util.List;
 

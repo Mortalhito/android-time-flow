@@ -1,187 +1,70 @@
 package com.example.timeflow.ui;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import com.example.timeflow.R;
-import com.example.timeflow.room.database.DatabaseHelper;
+import com.example.timeflow.room.database.AppDatabase;
 import com.example.timeflow.room.entity.CountdownEvent;
-
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Locale;
 
 public class CountdownDetailActivity extends AppCompatActivity {
 
+    // 严格对应 activity_countdown_detail.xml 中的 ID
     private TextView tvEventTitle, tvTimePrefix, tvDaysDisplay, tvDisplayUnit, tvTargetDateFull;
+    private View section1;
     private CountdownEvent currentEvent;
-    private DatabaseHelper databaseHelper;
-    private View section1, section2, section3; // 新增：三个部分的视图引用
-    // 显示模式枚举
-    private enum DisplayMode {
-        DAYS, YEARS_MONTHS_DAYS, MONTHS_DAYS, WEEKS_DAYS
-    }
+    private AppDatabase db;
 
+    private enum DisplayMode { DAYS, YEARS_MONTHS_DAYS, MONTHS_DAYS, WEEKS_DAYS }
     private DisplayMode currentDisplayMode = DisplayMode.DAYS;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_countdown_detail);
+        db = AppDatabase.getInstance(this);
 
-        initViews();
-        initData();
-        setupClickListeners();
-        updateDisplay();
-        setupSectionBackgrounds(); // 新增：设置各部分背景色
-    }
-
-    private void initViews() {
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-
-        // 设置编辑按钮（右上角）
-        ImageButton btnEdit = findViewById(R.id.btnEdit);
-        btnEdit.setOnClickListener(v -> {
-            // 预留编辑功能
-            // showEditDialog();
-        });
-
-        // 初始化三个部分的视图
-        section1 = findViewById(R.id.section1);
-        section2 = findViewById(R.id.section2);
-        section3 = findViewById(R.id.section3);
-
+        // ID 绑定
         tvEventTitle = findViewById(R.id.tvEventTitle);
         tvTimePrefix = findViewById(R.id.tvTimePrefix);
         tvDaysDisplay = findViewById(R.id.tvDaysDisplay);
         tvDisplayUnit = findViewById(R.id.tvDisplayUnit);
         tvTargetDateFull = findViewById(R.id.tvTargetDateFull);
+        section1 = findViewById(R.id.section1);
 
-        // 设置返回按钮点击事件
-        toolbar.setNavigationOnClickListener(v -> finish());
-    }
+        // ID 绑定: btnBack (Toolbar默认或ImageButton), btnDelete
+        findViewById(R.id.btnEdit).setOnClickListener(v -> deleteEvent());
 
-    // 新增方法：设置各部分背景色
-    private void setupSectionBackgrounds() {
-        // 第一部分：蓝/橙色背景
-        if(currentEvent.isPast()){
-            section1.setBackgroundColor(getResources().getColor(android.R.color.holo_orange_dark));
-        } else {
-            section1.setBackgroundColor(getResources().getColor(android.R.color.holo_blue_dark));
+        if (section1 != null) {
+            section1.setOnClickListener(v -> switchDisplayMode());
         }
 
-        // 第二部分：白色背景（默认就是白色，可以不用设置）
-        section2.setBackgroundColor(Color.WHITE);
-
-        // 第三部分：灰色背景
-        section3.setBackgroundColor(getResources().getColor(R.color.section3_gray));
+        loadData();
     }
 
-    private void initData() {
-        databaseHelper = new DatabaseHelper(this);
+    private void loadData() {
+        String id = getIntent().getStringExtra("event_id");
+        if (id == null) return;
 
-        String eventId = getIntent().getStringExtra("event_id");
-
-        if (eventId != null) {
-            try {
-                currentEvent = databaseHelper.getEventById(eventId);
-                if (currentEvent != null) {
-                    displayEventDetails();
-                } else {
-                    // 尝试从事件列表中查找
-                    Toast.makeText(this, "事件不存在，ID: " + eventId, Toast.LENGTH_LONG).show();
-                    finish();
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                Toast.makeText(this, "加载事件失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                finish();
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            CountdownEvent event = db.eventDao().getEventById(id);
+            if (event != null) {
+                event.calculateDaysLeft();
+                runOnUiThread(() -> {
+                    currentEvent = event;
+                    updateDisplay();
+                });
             }
-        } else {
-            Toast.makeText(this, "事件ID为空", Toast.LENGTH_SHORT).show();
-            finish();
-        }
-    }
-
-    private void displayEventDetails() {
-        if (currentEvent == null) return;
-
-        tvEventTitle.setText(currentEvent.getSafeName());
-
-        // 设置时间前缀（还有/已经）
-        if (currentEvent.isPast()) {
-            tvTimePrefix.setText("已经");
-            tvDaysDisplay.setTextColor(getResources().getColor(android.R.color.holo_orange_dark));
-        } else {
-            tvTimePrefix.setText("还有");
-            tvDaysDisplay.setTextColor(getResources().getColor(android.R.color.holo_blue_dark));
-        }
-
-        // 设置完整的目标日期
-        String targetDate = currentEvent.getTargetDate();
-        String weekDay = getWeekDayFromDate(targetDate);
-        tvTargetDateFull.setText(String.format("目标日：%s %s", targetDate, weekDay));
-    }
-
-    private String getWeekDayFromDate(String dateStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            java.util.Date date = sdf.parse(dateStr);
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(date);
-
-            String[] weekDays = {"星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"};
-            int weekDayIndex = calendar.get(Calendar.DAY_OF_WEEK) - 1;
-            return weekDays[weekDayIndex];
-        } catch (Exception e) {
-            return "";
-        }
-    }
-
-    private void setupClickListeners() {
-        // 编辑按钮点击事件
-        findViewById(R.id.btnEdit).setOnClickListener(v -> {
-            // 预留编辑功能
-            // showEditDialog();
         });
-
-        // 第二部分点击切换显示模式
-        findViewById(R.id.section2).setOnClickListener(v -> {
-            switchDisplayMode();
-        });
-    }
-
-    private void switchDisplayMode() {
-        // 循环切换显示模式
-        switch (currentDisplayMode) {
-            case DAYS:
-                currentDisplayMode = DisplayMode.YEARS_MONTHS_DAYS;
-                break;
-            case YEARS_MONTHS_DAYS:
-                currentDisplayMode = DisplayMode.MONTHS_DAYS;
-                break;
-            case MONTHS_DAYS:
-                currentDisplayMode = DisplayMode.WEEKS_DAYS;
-                break;
-            case WEEKS_DAYS:
-                currentDisplayMode = DisplayMode.DAYS;
-                break;
-        }
-        updateDisplay();
     }
 
     private void updateDisplay() {
         if (currentEvent == null) return;
+        tvEventTitle.setText(currentEvent.getName());
+        tvTimePrefix.setText(currentEvent.isPast() ? "已经" : "还有");
+        tvTargetDateFull.setText("目标日：" + currentEvent.getTargetDate());
 
         int totalDays = Math.abs(currentEvent.getDaysLeft());
 
@@ -190,34 +73,41 @@ public class CountdownDetailActivity extends AppCompatActivity {
                 tvDaysDisplay.setText(String.valueOf(totalDays));
                 tvDisplayUnit.setText("天");
                 break;
-
             case YEARS_MONTHS_DAYS:
                 int years = totalDays / 365;
-                int remainingDays = totalDays % 365;
-                int months = remainingDays / 30;
-                int days = remainingDays % 30;
-
-                if (years > 0) {
-                    tvDaysDisplay.setText(String.format("%d年%d个月%d天", years, months, days));
-                } else {
-                    tvDaysDisplay.setText(String.format("%d个月%d天", months, days));
-                }
+                int remDays = totalDays % 365;
+                int months = remDays / 30;
+                int days = remDays % 30;
+                tvDaysDisplay.setText(years > 0 ?
+                        String.format("%d年%d个月%d天", years, months, days) :
+                        String.format("%d个月%d天", months, days));
                 tvDisplayUnit.setText("");
                 break;
-
-            case MONTHS_DAYS:
-                int totalMonths = totalDays / 30;
-                int remainingDaysFromMonths = totalDays % 30;
-                tvDaysDisplay.setText(String.format("%d个月%d天", totalMonths, remainingDaysFromMonths));
-                tvDisplayUnit.setText("");
-                break;
-
             case WEEKS_DAYS:
-                int weeks = totalDays / 7;
-                int remainingDaysFromWeeks = totalDays % 7;
-                tvDaysDisplay.setText(String.format("%d周%d天", weeks, remainingDaysFromWeeks));
+                tvDaysDisplay.setText(String.format("%d周%d天", totalDays / 7, totalDays % 7));
                 tvDisplayUnit.setText("");
+                break;
+            default:
+                tvDaysDisplay.setText(String.valueOf(totalDays));
+                tvDisplayUnit.setText("天");
                 break;
         }
+    }
+
+    private void switchDisplayMode() {
+        DisplayMode[] modes = DisplayMode.values();
+        currentDisplayMode = modes[(currentDisplayMode.ordinal() + 1) % modes.length];
+        updateDisplay();
+    }
+
+    private void deleteEvent() {
+        if (currentEvent == null) return;
+        AppDatabase.databaseWriteExecutor.execute(() -> {
+            db.eventDao().deleteById(currentEvent.getId());
+            runOnUiThread(() -> {
+                Toast.makeText(this, "已删除", Toast.LENGTH_SHORT).show();
+                finish();
+            });
+        });
     }
 }

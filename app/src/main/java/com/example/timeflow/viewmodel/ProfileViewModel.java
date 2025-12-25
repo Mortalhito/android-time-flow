@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
-import com.example.timeflow.repository.UserRepository;
+import com.example.timeflow.room.repository.UserRepository;
 import com.example.timeflow.room.entity.User;
 
 public class ProfileViewModel extends AndroidViewModel {

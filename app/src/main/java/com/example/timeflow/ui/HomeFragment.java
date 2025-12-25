@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.timeflow.R;
 import com.example.timeflow.adapter.CalendarEventAdapter;
 import com.example.timeflow.room.entity.CalendarEvent;
-import com.example.timeflow.repository.CalendarEventRepository;
+import com.example.timeflow.room.repository.CalendarEventRepository;
 import com.example.timeflow.view.CustomCalendarView;
 
 import java.util.ArrayList;
