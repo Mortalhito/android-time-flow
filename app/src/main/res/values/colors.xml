@@ -15,7 +15,6 @@
     <color name="category_other">#FF9C27B0</color>
 
     <!-- 背景颜色 -->
-    <color name="background">#FFF5F5F5</color>
     <color name="surface">#FFFFFFFF</color>
     <color name="gray_light">#E0E0E0</color>
 
@@ -37,5 +36,19 @@
     <color name="Primary">#3F51B5</color>
     <color name="Primary_Dark">#303F9F</color>
     <color name="accent">#FFC107</color>
-    
+
+    <color name="confirm_accent">#FFC107</color>
+    <color name="confirm_dark">#FFA000</color>
+    <color name="confirm_light">#FFECB3</color>
+
+
+    <color name="success">#4CAF50</color>
+    <color name="danger">#F44336</color>
+    <color name="background">#F5F7FA</color>
+    <color name="card_background">#FFFFFF</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="divider">#E0E0E0</color>
+
+
 </resources>

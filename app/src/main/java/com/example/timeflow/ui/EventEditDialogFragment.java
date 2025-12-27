@@ -36,7 +36,7 @@ public class EventEditDialogFragment extends DialogFragment {
     private MaterialButtonToggleGroup priorityToggle;
     private MaterialCheckBox cbReminder;
     private View layoutReminderTime;
-    private Button btnCancel, btnConfirm, btnDelete;
+    private Button btnCancel, btnConfirm;
     private LinearLayout layoutButtons;
 
     // 添加缺失的变量声明
@@ -94,7 +94,7 @@ public class EventEditDialogFragment extends DialogFragment {
         layoutReminderTime = view.findViewById(R.id.layoutReminderTime);
         btnCancel = view.findViewById(R.id.btnCancel);
         btnConfirm = view.findViewById(R.id.btnConfirm);
-        btnDelete = view.findViewById(R.id.btnDelete);
+
         layoutButtons = view.findViewById(R.id.layoutButtons);
     }
 
@@ -121,9 +121,6 @@ public class EventEditDialogFragment extends DialogFragment {
         // 确认按钮
         btnConfirm.setOnClickListener(v -> saveEvent());
 
-        // 删除按钮
-        btnDelete.setOnClickListener(v -> deleteEvent());
-
         priorityToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
             updatePriorityButtonColors();
         });
@@ -137,7 +134,7 @@ public class EventEditDialogFragment extends DialogFragment {
             if (mode.equals("edit")) {
                 tvDialogTitle.setText("编辑事务");
                 btnConfirm.setText("确认修改");
-                btnDelete.setVisibility(View.VISIBLE);
+
 
                 event = (CalendarEvent) args.getSerializable(ARG_EVENT);
                 if (event != null) {
@@ -166,7 +163,6 @@ public class EventEditDialogFragment extends DialogFragment {
             } else {
                 tvDialogTitle.setText("添加事务");
                 btnConfirm.setText("确认添加");
-                btnDelete.setVisibility(View.GONE);
 
                 selectedDate = args.getString(ARG_SELECTED_DATE);
                 etEventDate.setText(selectedDate);

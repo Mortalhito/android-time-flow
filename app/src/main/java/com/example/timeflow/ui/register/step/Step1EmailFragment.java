@@ -38,6 +38,14 @@ public class Step1EmailFragment extends Fragment {
     private int countdown = 60;
     private boolean isCounting = false;
 
+    // 1. 定义正则表达式常量
+    private static final String EMAIL_PATTERN = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+
+    // 2. 校验方法
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches(EMAIL_PATTERN);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -71,7 +79,10 @@ public class Step1EmailFragment extends Fragment {
                 etEmail.setError("请输入邮箱");
                 return;
             }
-
+            if (!isValidEmail(email)) {
+                etEmail.setError("请先输入正确的邮箱");
+                return;
+            }
             if (isCounting) {
                 Toast.makeText(getContext(), "请等待倒计时结束", Toast.LENGTH_SHORT).show();
                 return;
@@ -131,11 +142,14 @@ public class Step1EmailFragment extends Fragment {
                 etEmail.setError("请输入邮箱");
                 return;
             }
-            if (code.isEmpty()) {
+            if(!isValidEmail(email)){
+                etEmail.setError("请先输入正确的邮箱");
+                return;
+            }
+            if (code.isEmpty() || code.length() <= 5) {
                 etCode.setError("请输入验证码");
                 return;
             }
-
             // 保存数据到ViewModel
             viewModel.email = email;
             viewModel.code = code;

@@ -55,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="下一步"
+            android:backgroundTint="@color/Primary_Dark"
             android:layout_marginTop="32dp" />
     </LinearLayout>
 </ScrollView>

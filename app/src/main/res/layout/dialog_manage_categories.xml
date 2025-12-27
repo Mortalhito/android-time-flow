@@ -24,6 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="添加新倒数本"
+        android:backgroundTint="@color/Primary_Dark"
         android:layout_gravity="end" />
 
 </LinearLayout>

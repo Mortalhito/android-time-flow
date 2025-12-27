@@ -93,7 +93,7 @@
             android:layout_height="64dp"
             android:text="开始专注"
             android:textSize="18sp"
-            android:backgroundTint="#FF4081"
+            android:backgroundTint="@color/Primary_Dark"
             android:textColor="@color/white"
             app:cornerRadius="32dp" />
 

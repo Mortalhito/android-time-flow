@@ -18,9 +18,11 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp">
         <com.google.android.material.textfield.TextInputEditText
+
             android:id="@+id/etCategoryName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:hint="名称（如：生日、工作）" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -46,6 +48,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="确定保存"
-        android:backgroundTint="@color/black" />
+        android:backgroundTint="@color/Primary_Dark" />
 
 </LinearLayout>

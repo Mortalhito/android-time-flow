@@ -10,16 +10,11 @@ public class User {
     @PrimaryKey
     @NonNull
     private String username;
-
+    private String password;
     private String email;
-
-    private String avatarUrl;
-
+    private String nickname;
+    private String avatar;
     private String token;
-
-
-    public User() {
-    }
 
     @NonNull
     public String getUsername() {
@@ -30,28 +25,20 @@ public class User {
         this.username = username;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getEmail() {
         return email;
     }
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getNickname() {
@@ -62,5 +49,19 @@ public class User {
         this.nickname = nickname;
     }
 
-    private String nickname;
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

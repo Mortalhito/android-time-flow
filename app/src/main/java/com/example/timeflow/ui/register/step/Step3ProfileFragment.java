@@ -2,6 +2,8 @@ package com.example.timeflow.ui.register.step;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Base64;
@@ -20,17 +22,19 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
+import com.example.timeflow.MainActivity;
 import com.example.timeflow.R;
 import com.example.timeflow.api.ApiClient;
 import com.example.timeflow.api.AuthApi;
-import com.example.timeflow.room.datastore.TokenManager;
+import com.example.timeflow.requestandresponse.JwtResponse;
+import com.example.timeflow.requestandresponse.UserRegisterRequest;
 import com.example.timeflow.room.dao.UserDao;
 import com.example.timeflow.room.database.AppDatabase;
-import com.example.timeflow.requestandresponse.JwtResponse;
+import com.example.timeflow.room.datastore.TokenManager;
 import com.example.timeflow.room.entity.User;
-import com.example.timeflow.requestandresponse.UserRegisterRequest;
 import com.example.timeflow.viewmodel.RegisterViewModel;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
@@ -102,41 +106,72 @@ public class Step3ProfileFragment extends Fragment {
     }
 
     private void submitRegister() {
-        // 创建 UserRegisterRequest 对象
+        String nickname = viewModel.nickname.trim();
+        if (nickname.isEmpty()) {
+            Toast.makeText(getContext(), "请输入昵称", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        viewModel.nickname = nickname;
+
+        // --- 核心修改部分：压缩图片 ---
+        String avatarBase64 = "";
+        if (avatarUri != null) {
+            avatarBase64 = compressAndEncodeImage(avatarUri);
+        }
+
+        // 构建请求对象
         UserRegisterRequest registerRequest = new UserRegisterRequest();
         registerRequest.setUsername(viewModel.username);
         registerRequest.setPassword(viewModel.password);
         registerRequest.setEmail(viewModel.email);
         registerRequest.setNickname(viewModel.nickname);
-
-        // 处理头像 - 这里需要根据后端要求处理
-        // 方案1: 如果后端支持文件上传，需要先上传头像获取URL
-        // 方案2: 如果后端支持base64，将头像转换为base64字符串
-        // 方案3: 如果头像可选，可以先传空或默认值
-        if (avatarUri != null) {
-            // 这里需要实现头像处理逻辑
-            String avatarBase64 = convertImageToBase64(avatarUri);
-            registerRequest.setAvatar(avatarBase64);
-        } else {
-            registerRequest.setAvatar(""); // 或者传 null，根据后端要求
-        }
+        registerRequest.setAvatar(avatarBase64); // 这里是压缩后的极短字符串
 
         // 调用注册接口
         authApi.register(registerRequest).enqueue(registerCallback);
     }
 
-    private String convertImageToBase64(Uri uri) {
+    private String compressAndEncodeImage(Uri uri) {
         try {
-            InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
-            byte[] bytes = new byte[inputStream.available()];
-            inputStream.read(bytes);
-            inputStream.close();
+            // 1. 获取原始图片的输入流
+            InputStream is = requireContext().getContentResolver().openInputStream(uri);
+            Bitmap originalBitmap = BitmapFactory.decodeStream(is);
 
-            String base64 = Base64.encodeToString(bytes, Base64.DEFAULT);
-            return "data:image/jpeg;base64," + base64; // 根据实际图片格式调整
+            // 2. 缩小尺寸：头像不需要太清晰，200x200 像素足够了
+            // 这步能减少 90% 以上的字符长度
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 200, 200, true);
+
+            // 3. 质量压缩
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos); // 50 表示 50% 的压缩质量
+
+            byte[] bytes = baos.toByteArray();
+
+            // 4. 清理内存
+            if (is != null) is.close();
+            originalBitmap.recycle();
+            scaledBitmap.recycle();
+
+            // 5. 转回 Base64
+            return Base64.encodeToString(bytes, Base64.NO_WRAP);
 
         } catch (Exception e) {
             e.printStackTrace();
+            return "";
+        }
+    }
+
+    private String encodeImage(Uri uri) {
+        try {
+            InputStream inputStream = requireContext().getContentResolver().openInputStream(uri);
+            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+            // 这里建议先压缩，否则 Base64 太长可能存入失败（哪怕数据库改了 LONGTEXT，内存开销也大）
+            Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, 120, 120, true);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+            byte[] bytes = baos.toByteArray();
+            return Base64.encodeToString(bytes, Base64.NO_WRAP);
+        } catch (Exception e) {
             return null;
         }
     }
@@ -144,12 +179,35 @@ public class Step3ProfileFragment extends Fragment {
     private Callback<JwtResponse> registerCallback = new Callback<JwtResponse>() {
         @Override
         public void onResponse(Call<JwtResponse> call, Response<JwtResponse> response) {
+            // 建议修改后的逻辑
             if (response.isSuccessful() && response.body() != null) {
-                // 注册成功，保存token和用户信息
                 String token = response.body().getToken();
-                saveUserAndToken(token);
-                Toast.makeText(getContext(), "注册成功", Toast.LENGTH_SHORT).show();
-                requireActivity().finish();
+                String base64Avatar = (avatarUri != null) ? encodeImage(avatarUri) : null;
+                // 1. 先把 Uri 转成 Base64（在主线程做或提前准备好）
+
+                new Thread(() -> {
+                    UserDao userDao = AppDatabase.getInstance(requireContext()).userDao();
+                    User user = new User();
+                    user.setUsername(viewModel.username);
+                    user.setEmail(viewModel.email);
+                    user.setNickname(viewModel.nickname);
+                    user.setToken(token);
+
+                    // !!! 之前您这里漏掉了这一行，所以断点是 null !!!
+                    user.setAvatar(base64Avatar);
+
+                    userDao.clear();
+                    userDao.saveUser(user);
+
+                    // 保存 Token 到 DataStore/SharedPreferences
+                    new TokenManager(requireContext()).saveToken(token);
+
+                    // 跳转
+                    requireActivity().runOnUiThread(() -> {
+                        startActivity(new Intent(getContext(), MainActivity.class));
+                        requireActivity().finish();
+                    });
+                }).start();
             } else {
                 Toast.makeText(getContext(), "注册失败", Toast.LENGTH_SHORT).show();
             }
