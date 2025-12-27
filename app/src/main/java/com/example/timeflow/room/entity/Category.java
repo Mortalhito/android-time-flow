@@ -41,5 +41,5 @@ public class Category {
     public int getColor() { return color; }
     public void setColor(int color) { this.color = color; }
     public boolean isDefault() { return isDefault; }
-    public void setDefault(boolean isDefault) { this.isDefault = isDefault; }
+
 }
