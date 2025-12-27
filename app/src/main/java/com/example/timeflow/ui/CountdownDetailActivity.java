@@ -34,7 +34,8 @@ public class CountdownDetailActivity extends AppCompatActivity {
     private ImageButton btnBack, btnEdit; // 新增按钮引用
     private enum DisplayMode { DAYS, YEARS_MONTHS_DAYS, MONTHS_DAYS, WEEKS_DAYS }
     private DisplayMode currentDisplayMode = DisplayMode.DAYS;
-
+    private View categoryColorView;
+    private TextView tvCategoryName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +51,9 @@ public class CountdownDetailActivity extends AppCompatActivity {
         setupClickListeners();
 
         initData();
+        System.out.println(1);
+        // 显示分类名称和颜色
+
     }
 
     private void initData() {
@@ -63,9 +67,33 @@ public class CountdownDetailActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     currentEvent = event;
                     updateDisplay();
+
+                    if (currentEvent == null) {
+                        Toast.makeText(this, "事件不存在", Toast.LENGTH_SHORT).show();
+                        finish();
+                        return;
+                    }
+
+                    // 【新增功能：显示倒数本名称和颜色】
+                    if (currentEvent.getCategoryName() != null && !currentEvent.getCategoryName().isEmpty()) {
+                        tvCategoryName.setText("所属倒数本：" + currentEvent.getCategoryName());
+
+                        // 设置颜色块（方形带小圆角）
+                        GradientDrawable shape = new GradientDrawable();
+                        shape.setShape(GradientDrawable.RECTANGLE);
+                        shape.setCornerRadius(4f);  // 小圆角
+                        shape.setColor(currentEvent.getCategoryColor());
+                        categoryColorView.setBackground(shape);
+                    } else {
+                        tvCategoryName.setText("所属倒数本：未知");
+                        categoryColorView.setVisibility(View.GONE);  // 隐藏颜色块
+                    }
                 });
             }
+
         });
+
+
     }
 
     private void updateDisplay() {
@@ -119,6 +147,8 @@ public class CountdownDetailActivity extends AppCompatActivity {
         // 绑定新添加的两个按钮
         btnBack = findViewById(R.id.btnBack);
         btnEdit = findViewById(R.id.btnEdit);
+        categoryColorView = findViewById(R.id.categoryColorView);
+        tvCategoryName = findViewById(R.id.tvCategoryName);
     }
 
     private void setupClickListeners() {

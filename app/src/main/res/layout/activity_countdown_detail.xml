@@ -124,6 +124,31 @@
                     android:textSize="14sp" />
             </LinearLayout>
 
+
+            <!-- -->
+            <!-- 新增：显示倒数本分类 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="16dp">
+
+                <View
+                    android:id="@+id/categoryColorView"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@color/black" />  <!-- 默认颜色，代码中动态设置 -->
+
+                <TextView
+                    android:id="@+id/tvCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="所属倒数本：未知"
+                    android:textColor="#666666"
+                    android:textSize="14sp" />
+            </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

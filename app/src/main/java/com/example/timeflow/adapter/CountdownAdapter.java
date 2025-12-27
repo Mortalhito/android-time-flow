@@ -2,7 +2,6 @@ package com.example.timeflow.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -81,13 +80,29 @@ public class CountdownAdapter extends RecyclerView.Adapter<CountdownAdapter.View
         CountdownEvent event = eventList.get(position);
 
         holder.tvEventName.setText(event.getName());
-        holder.tvCategory.setText(event.getCategoryName());
+
         holder.tvDaysLeft.setText(event.getDisplayText());
         holder.tvTargetDate.setText(event.getTargetDate());
 
         // 设置分类标签颜色
-        holder.tvCategory.setBackgroundColor(event.getCategoryColor());
-        holder.tvCategory.setTextColor(Color.WHITE);
+        if (event.getCategoryName() != null) {
+            holder.tvCategory.setVisibility(View.VISIBLE);
+            holder.tvCategory.setText(event.getCategoryName());
+
+            // 动态创建带圆角的彩色背景
+            android.graphics.drawable.GradientDrawable drawable = new android.graphics.drawable.GradientDrawable();
+            drawable.setShape(android.graphics.drawable.GradientDrawable.RECTANGLE);
+            drawable.setCornerRadius(12f); // 设置圆角
+
+            // 使用数据库中存入的颜色，如果没有颜色则给个默认灰色
+            int color = event.getCategoryColor() != 0 ? event.getCategoryColor() : android.graphics.Color.GRAY;
+            drawable.setColor(color);
+
+            holder.tvCategory.setBackground(drawable);
+        } else {
+            // 如果没有分类，则隐藏标签
+            holder.tvCategory.setVisibility(View.GONE);
+        }
 
         // 根据事件是否已过去设置不同的背景颜色
         GradientDrawable backgroundDrawable = new GradientDrawable();

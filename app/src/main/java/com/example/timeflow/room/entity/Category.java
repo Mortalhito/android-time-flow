@@ -27,12 +27,15 @@ public class Category {
         this.isDefault = isDefault;
     }
 
-    public Category(int i, String name, int color) {
-
+    @Ignore
+    public Category(String name, int color) {
         this.name = name;
         this.color = color;
         this.isDefault = false;
     }
+
+
+
 
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }

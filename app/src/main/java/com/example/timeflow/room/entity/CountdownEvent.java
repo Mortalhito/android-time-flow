@@ -25,9 +25,9 @@ public class CountdownEvent {
     private int daysLeft;
     @Ignore
     private boolean isPast;
-    @Ignore
+
     private String categoryName;
-    @Ignore
+
     private int categoryColor;
 
     @Ignore

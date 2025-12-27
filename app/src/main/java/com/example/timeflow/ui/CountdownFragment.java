@@ -6,6 +6,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.icu.text.SimpleDateFormat;
 import android.icu.util.Calendar;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -47,7 +50,6 @@ public class CountdownFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // 布局文件: fragment_countdown.xml
         View view = inflater.inflate(R.layout.fragment_countdown, container, false);
         db = AppDatabase.getInstance(requireContext());
 
@@ -239,61 +241,94 @@ public class CountdownFragment extends Fragment {
         // 绑定“添加新倒数本”按钮的点击事件
         view.findViewById(R.id.btnAddCategory).setOnClickListener(v -> {
             // 先关闭当前管理弹窗，再打开添加弹窗
+
             dialog.dismiss();
             showAddCategoryDialog();
         });
+
+
 
         dialog.setContentView(view);
         dialog.show();
     }
 
-    private int selectedColor = 0xFF42A5F5; // 成员变量记录颜色
+    @Override
+    public void onResume() {
+        super.onResume();
+        initData(); // 每次返回 Fragment 时刷新事件和分类
+    }
 
     private void showAddCategoryDialog() {
         BottomSheetDialog dialog = new BottomSheetDialog(requireContext());
         View view = getLayoutInflater().inflate(R.layout.dialog_add_category, null);
 
         TextInputEditText etName = view.findViewById(R.id.etCategoryName);
-        View colorPickerPreview = view.findViewById(R.id.colorPickerPreview); // 对应新ID
+        View colorPreview = view.findViewById(R.id.colorPickerPreview);
+        Button btnConfirm = view.findViewById(R.id.btnConfirm);
 
-        // 1. 初始化预览块样式（做成圆形）
-        updateColorCircle(colorPickerPreview, selectedColor);
+        final int[] selectedColor = {ContextCompat.getColor(requireContext(), android.R.color.holo_blue_light)};
 
-        // 2. 点击预览块弹出“光谱选择器”
-        colorPickerPreview.setOnClickListener(v -> {
-            // 参数：Context, 初始颜色, 监听器
-            AmbilWarnaDialog colorPickerDialog = new AmbilWarnaDialog(getContext(), selectedColor, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-                @Override
-                public void onCancel(AmbilWarnaDialog dialog) {
-                    // 取消不处理
-                }
+        // 更新预览圆圈
+        updateColorCircle(colorPreview, selectedColor[0]);
 
-                @Override
-                public void onOk(AmbilWarnaDialog dialog, int color) {
-                    // 重点：用户选完光谱颜色后更新变量和界面
-                    selectedColor = color;
-                    updateColorCircle(colorPickerPreview, selectedColor);
+        // 点击圆圈打开颜色选择器
+        colorPreview.setOnClickListener(v -> new AmbilWarnaDialog(getContext(), selectedColor[0], new AmbilWarnaDialog.OnAmbilWarnaListener() {
+            @Override
+            public void onCancel(AmbilWarnaDialog dialog) {}
+
+            @Override
+            public void onOk(AmbilWarnaDialog dialog, int color) {
+                selectedColor[0] = color;
+                updateColorCircle(colorPreview, color);
+            }
+        }).show());
+
+        // 【新增标志】：是否是通过“确认”按钮成功添加
+        final boolean[] isSuccessAdd = {false};
+
+        // 确认按钮逻辑
+        btnConfirm.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            if (name.isEmpty()) {
+                Toast.makeText(getContext(), "请输入名称", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            AppDatabase.databaseWriteExecutor.execute(() -> {
+                Category existing = db.categoryDao().getByName(name);
+                if (existing != null) {
+                    requireActivity().runOnUiThread(() ->
+                            Toast.makeText(getContext(), "已存在同名倒数本，添加失败", Toast.LENGTH_SHORT).show()
+                    );
+                } else {
+                    Category category = new Category(name, selectedColor[0]);
+                    db.categoryDao().insert(category);
+
+                    requireActivity().runOnUiThread(() -> {
+                        Toast.makeText(getContext(), "添加成功", Toast.LENGTH_SHORT).show();
+                        initData();
+                        isSuccessAdd[0] = true;  // 【标记：这是成功添加】
+                        dialog.dismiss();       // 触发 onDismissListener，但会被下面的判断跳过
+
+                        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                            showAddEventDialog();  // 成功后直接回到添加倒数日（新对话框）
+                        }, 300);
+                    });
                 }
             });
-            colorPickerDialog.show();
         });
 
-        // 3. 确定按钮
-        view.findViewById(R.id.btnConfirm).setOnClickListener(v -> {
-            String name = etName.getText().toString().trim();
-            if (!name.isEmpty()) {
-                AppDatabase.databaseWriteExecutor.execute(() -> {
-                    db.categoryDao().insert(new Category(0, name, selectedColor));
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            initData(); // 刷新分类列表
-                            dialog.dismiss();
-                        });
-                    }
-                });
-            } else {
-                Toast.makeText(getContext(), "请输入名称", Toast.LENGTH_SHORT).show();
+        // 【关键：onDismissListener 判断是否成功添加】
+        dialog.setOnDismissListener(d -> {
+            if (isSuccessAdd[0]) {
+                // 如果是成功添加导致的 dismiss，什么都不做（已经手动打开了添加倒数日）
+                return;
             }
+
+            // 否则是用户手动取消（点空白、返回键），回到管理界面
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                showManageCategoriesDialog();
+            }, 300);
         });
 
         dialog.setContentView(view);
