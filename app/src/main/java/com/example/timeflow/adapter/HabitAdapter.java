@@ -6,17 +6,22 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.timeflow.R;
 import com.example.timeflow.room.entity.Habit;
+import com.example.timeflow.viewmodel.HabitViewModel;
+
 import java.util.List;
 
 public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> {
 
     private List<Habit> habitList;
     private OnHabitCheckedListener listener;
-
+    private HabitViewModel habitViewModel;
     public interface OnHabitCheckedListener {
         void onHabitChecked(Habit habit, int position, boolean isChecked);
     }
@@ -25,7 +30,11 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         this.habitList = habitList;
         this.listener = listener;
     }
-
+    public HabitAdapter(List<Habit> habitList, OnHabitCheckedListener listener, HabitViewModel habitViewModel) {
+        this.habitList = habitList;
+        this.listener = listener;
+        this.habitViewModel = habitViewModel; // 添加这一行
+    }
     public void updateData(List<Habit> newList) {
         this.habitList = newList;
         notifyDataSetChanged();
@@ -38,70 +47,67 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
-    // 在onBindViewHolder方法中更新进度显示逻辑
-    // 修复后的 onBindViewHolder 方法
+    // 在HabitAdapter的onBindViewHolder中更新完成逻辑
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // 添加空值检查
-        if (habitList == null || position < 0 || position >= habitList.size()) {
-            return;
-        }
-
         Habit habit = habitList.get(position);
-        if (habit == null) {
-            return;
-        }
 
-        // 添加空值检查
-        if (holder.tvHabitName != null) {
-            holder.tvHabitName.setText(habit.getName());
+        // 显示习惯名称
+        holder.tvHabitName.setText(habit.getName());
 
-            // 显示每日目标次数
-            String targetText = habit.getDailyTargetCount() > 1 ?
-                    String.format("(%d/%d)", habit.getTodayCompletedCount(), habit.getDailyTargetCount()) : "";
-            holder.tvHabitName.setText(habit.getName() + targetText);
-        }
+        // 设置复选框状态
+        holder.cbCompleted.setChecked(false);
+        holder.cbCompleted.setEnabled(habit.isTodayInFrequency());
 
-        if (holder.cbCompleted != null) {
-            holder.cbCompleted.setChecked(habit.isCompletedToday());
-            holder.cbCompleted.setEnabled(habit.isTodayInFrequency());
+        // 如果今天不在频率内，显示灰色并禁用
 
-            // 修复监听器设置，避免重复触发
-            holder.cbCompleted.setOnCheckedChangeListener(null);
-            holder.cbCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                int adapterPosition = holder.getAdapterPosition();
-                if (adapterPosition != RecyclerView.NO_POSITION && listener != null) {
-                    listener.onHabitChecked(habit, adapterPosition, isChecked);
+        if (!habit.isTodayInFrequency()) {
+            holder.cbCompleted.setAlpha(0.5f);
+            holder.tvHabitName.setAlpha(0.7f);
+        } else {
+            holder.cbCompleted.setAlpha(1f);
+            holder.tvHabitName.setAlpha(1f);
+
+            // 获取今天的记录
+            habitViewModel.getOrCreateTodayRecord(habit.getId());
+            habitViewModel.getCurrentRecord().observe((LifecycleOwner) holder.itemView.getContext(), record -> {
+                if (record != null && record.getHabitId() == habit.getId()) {
+                    holder.cbCompleted.setChecked(record.getCompletedCount() > 0);
                 }
             });
         }
 
-        // 进度显示逻辑
-        if (holder.tvProgress != null && holder.progressBar != null) {
-            float totalCompletionRate = 0;
-            if (habit.getTotalDays() > 0) {
-                totalCompletionRate = (float) habit.getCompletedDays() / habit.getTotalDays() * 100;
+        // 复选框监听器
+        holder.cbCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                habitViewModel.getOrCreateTodayRecord(habit.getId());
+                habitViewModel.getCurrentRecord().observe((LifecycleOwner) holder.itemView.getContext(), record -> {
+                    if (record != null) {
+                        record.setCompletedCount(record.getCompletedCount() + 1);
+                        habitViewModel.updateRecord(record);
+                    }
+                });
             }
+        });
 
-            holder.tvProgress.setText(String.format("%d/%d 天 (%.0f%%)",
-                    habit.getCompletedDays(), habit.getTotalDays(), totalCompletionRate));
-            holder.progressBar.setProgress((int) totalCompletionRate);
+        // 显示统计信息
+        habitViewModel.getTotalCompletedDays(habit.getId()).observe((LifecycleOwner) holder.itemView.getContext(), days -> {
+            habitViewModel.getTotalCompletedCount(habit.getId()).observe((LifecycleOwner) holder.itemView.getContext(), count -> {
+                holder.tvProgress.setText(String.format("已完成 %d 天，共 %d 次", days, count));
+            });
+        });
+    }
 
-            // 设置进度条颜色
-            try {
-                int color;
-                if (totalCompletionRate >= 80) {
-                    color = holder.itemView.getContext().getResources().getColor(R.color.red);
-                } else if (totalCompletionRate >= 50) {
-                    color = holder.itemView.getContext().getResources().getColor(R.color.yellow);
-                } else {
-                    color = holder.itemView.getContext().getResources().getColor(R.color.green);
-                }
-                holder.progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    private void setProgressBarColor(ProgressBar progressBar, float progress) {
+        int color;
+        if (progress >= 80) {
+            color = progressBar.getContext().getResources().getColor(R.color.green);
+        } else if (progress >= 50) {
+            color = progressBar.getContext().getResources().getColor(R.color.yellow);
+        } else {
+            color = progressBar.getContext().getResources().getColor(R.color.red);
         }
+        progressBar.setProgressTintList(android.content.res.ColorStateList.valueOf(color));
     }
 
     @Override
@@ -109,6 +115,12 @@ public class HabitAdapter extends RecyclerView.Adapter<HabitAdapter.ViewHolder> 
         return habitList.size();
     }
 
+    public void clear() {
+        if (habitList != null) {
+            habitList.clear();
+            notifyDataSetChanged();
+        }
+    }
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvHabitName, tvProgress;
         CheckBox cbCompleted;

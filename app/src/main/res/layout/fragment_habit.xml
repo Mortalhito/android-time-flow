@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/add_habit"
-            android:backgroundTint="@color/black" />
+            android:backgroundTint="@color/Primary_Dark" />
 
     </LinearLayout>
 
@@ -41,14 +41,16 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/this_week"
-            android:checked="true" />
+            android:checked="true"
+            android:backgroundTint="@color/orange_500"/>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnMonth"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/this_month" />
+            android:text="@string/this_month"
+            android:backgroundTint="@color/orange_500"/>
 
     </com.google.android.material.button.MaterialButtonToggleGroup>
 

@@ -20,13 +20,14 @@ import com.example.timeflow.room.entity.Category;
 import com.example.timeflow.room.entity.CountdownEvent;
 import com.example.timeflow.room.entity.FocusRecord;
 import com.example.timeflow.room.entity.Habit;
+import com.example.timeflow.room.entity.HabitRecord;
 import com.example.timeflow.room.entity.User;
 import com.example.timeflow.utils.Converters;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@Database(entities = {CalendarEvent.class, Habit.class, FocusRecord.class, User.class, Category.class, CountdownEvent.class}, version = 1, exportSchema = false)
+@Database(entities = {CalendarEvent.class, Habit.class, HabitRecord.class, FocusRecord.class, User.class, Category.class, CountdownEvent.class}, version = 1, exportSchema = false)
 @TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase {
     private static volatile AppDatabase INSTANCE;

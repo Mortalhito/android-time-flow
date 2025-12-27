@@ -5,4 +5,22 @@
     </style>
 
     <style name="Theme.Timeflow" parent="Base.Theme.Timeflow" />
+
+    <style name="WeekDayButton" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="backgroundTint">@null</item>
+        <item name="strokeColor">@null</item>
+        <item name="android:background">@drawable/btn_week_day_selector</item>
+        <item name="android:textColor">@color/week_day_text_color</item>
+        <item name="android:layout_width">38dp</item>
+        <item name="android:layout_height">38dp</item>
+        <item name="android:layout_margin">2dp</item>
+        <item name="android:checkable">true</item>
+        <item name="android:checked">true</item>
+
+        <item name="android:padding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:insetLeft">0dp</item>
+        <item name="android:insetRight">0dp</item>
+    </style>
 </resources>

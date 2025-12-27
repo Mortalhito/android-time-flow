@@ -26,42 +26,6 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- 图标选择区域 -->
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="选择图标"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp" />
-
-        <HorizontalScrollView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:id="@+id/iconContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <!-- 图标将通过代码动态添加 -->
-                <!-- 示例图标布局 -->
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_margin="4dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:src="@drawable/icon"
-                    android:padding="8dp" />
-
-                <!-- 可以添加更多图标 -->
-
-            </LinearLayout>
-        </HorizontalScrollView>
-
         <!-- 重复周期盒子 -->
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -98,7 +62,6 @@
                         android:layout_weight="6"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="2dp"
-
                         app:singleSelection="true"
                         app:selectionRequired="true">
 
@@ -123,28 +86,6 @@
                             android:text="周随机"
                             app:strokeColor="@color/design_default_color_primary"
                             app:strokeWidth="1dp" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnMonthlyFixed"
-                            style="@style/CompactOutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="月定期"
-                            android:layout_marginEnd="2dp"
-                            app:strokeColor="@color/design_default_color_primary"
-                            app:strokeWidth="1dp" />
-
-                        <com.google.android.material.button.MaterialButton
-                            android:id="@+id/btnMonthlyRandom"
-                            style="@style/CompactOutlinedButton"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:text="月随机"
-                            app:strokeColor="@color/design_default_color_primary"
-                            app:strokeWidth="1dp" />
-
                     </com.google.android.material.button.MaterialButtonToggleGroup>
 
                 </LinearLayout>
@@ -169,14 +110,59 @@
                             android:text="选择每周重复的日期"
                             android:layout_marginBottom="8dp" />
 
+                        <!-- 修改这里：添加边距和调整布局 -->
                         <LinearLayout
                             android:id="@+id/weekDayContainer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            android:gravity="center"
+                            android:paddingStart="8dp"
+                            android:paddingEnd="8dp"
+                            android:layout_marginBottom="8dp">
 
-                            <!-- 星期选择按钮将通过代码动态添加 -->
+                            <!-- 修改每个按钮的layout_weight和layout_width -->
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay0"
+                                style="@style/WeekDayButton"
+                                android:text="日"
+                                app:cornerRadius="19dp"/>
 
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay1"
+                                style="@style/WeekDayButton"
+                                android:text="一"
+                                app:cornerRadius="19dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay2"
+                                style="@style/WeekDayButton"
+                                android:text="二"
+                                app:cornerRadius="19dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay3"
+                                style="@style/WeekDayButton"
+                                android:text="三"
+                                app:cornerRadius="19dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay4"
+                                style="@style/WeekDayButton"
+                                android:text="四"
+                                app:cornerRadius="19dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay5"
+                                style="@style/WeekDayButton"
+                                android:text="无"
+                                app:cornerRadius="19dp"/>
+
+                            <com.google.android.material.button.MaterialButton
+                                android:id="@+id/btnDay6"
+                                style="@style/WeekDayButton"
+                                android:text="六"
+                                app:cornerRadius="19dp"/>
                         </LinearLayout>
 
                     </LinearLayout>
@@ -197,53 +183,6 @@
 
                         <NumberPicker
                             android:id="@+id/npWeeklyCount"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                    </LinearLayout>
-
-                    <!-- 月定期布局 -->
-                    <LinearLayout
-                        android:id="@+id/layoutMonthlyFixed"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="选择每月重复的日期"
-                            android:layout_marginBottom="8dp" />
-
-                        <LinearLayout
-                            android:id="@+id/monthDayContainer"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal">
-
-                            <!-- 月份日期选择将通过代码动态添加 -->
-
-                        </LinearLayout>
-
-                    </LinearLayout>
-
-                    <!-- 月随机布局 -->
-                    <LinearLayout
-                        android:id="@+id/layoutMonthlyRandom"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:visibility="gone">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="每月完成次数"
-                            android:layout_marginBottom="8dp" />
-
-                        <NumberPicker
-                            android:id="@+id/npMonthlyCount"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />
 
@@ -302,7 +241,8 @@
                             android:id="@+id/btnStartDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="选择开始时间" />
+                            android:text="选择开始时间"
+                            android:backgroundTint="@color/Primary_Dark"/>
 
                     </LinearLayout>
 
@@ -323,6 +263,7 @@
                             android:id="@+id/btnEndDate"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:backgroundTint="@color/Primary_Dark"
                             android:text="选择结束时间" />
 
                     </LinearLayout>
@@ -389,12 +330,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="取消"
+                android:backgroundTint="@color/orange_500"
                 android:layout_marginEnd="8dp" />
 
             <Button
                 android:id="@+id/btnSave"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:backgroundTint="@color/orange_500"
                 android:text="保存" />
 
         </LinearLayout>
