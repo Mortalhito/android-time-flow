@@ -7,8 +7,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +27,8 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class EventEditDialogFragment extends DialogFragment {
 
@@ -32,17 +37,23 @@ public class EventEditDialogFragment extends DialogFragment {
     public static final String ARG_MODE = "mode"; // "add" or "edit"
 
     private TextView tvDialogTitle;
-    private TextInputEditText etEventTitle, etEventDate, etEventTime, etReminderTime;
+    private TextInputEditText etEventTitle, etEventDate, etEventTime;
     private MaterialButtonToggleGroup priorityToggle;
     private MaterialCheckBox cbReminder;
     private View layoutReminderTime;
     private Button btnCancel, btnConfirm;
     private LinearLayout layoutButtons;
+    private Spinner spinnerReminderOptions;
 
     // 添加缺失的变量声明
     private CalendarEvent event;
     private String selectedDate;
     private String mode = "add"; // 默认为添加模式
+
+    // 预定义提醒选项映射
+    private Map<String, String> reminderOptionsMap;
+    private String[] reminderOptions;
+    private String selectedReminderOffset = "0"; // 默认不提醒
 
     private OnEventSaveListener listener;
 
@@ -77,10 +88,27 @@ public class EventEditDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_edit, container, false);
+        initReminderOptions();
         initViews(view);
         setupClickListeners();
         loadData();
         return view;
+    }
+
+    private void initReminderOptions() {
+        // 初始化提醒选项映射（分钟数）
+        reminderOptionsMap = new HashMap<>();
+        reminderOptionsMap.put("不提醒", "0");
+        reminderOptionsMap.put("准时提醒", "0");
+        reminderOptionsMap.put("提前30分钟", "30");
+        reminderOptionsMap.put("提前1小时", "60");
+        reminderOptionsMap.put("提前2小时", "120");
+        reminderOptionsMap.put("提前3小时", "180");
+        reminderOptionsMap.put("自定义", "custom");
+
+        reminderOptions = new String[]{
+                "不提醒", "准时提醒", "提前30分钟", "提前1小时", "提前2小时", "提前3小时", "自定义"
+        };
     }
 
     private void initViews(View view) {
@@ -88,14 +116,24 @@ public class EventEditDialogFragment extends DialogFragment {
         etEventTitle = view.findViewById(R.id.etEventTitle);
         etEventDate = view.findViewById(R.id.etEventDate);
         etEventTime = view.findViewById(R.id.etEventTime);
-        etReminderTime = view.findViewById(R.id.etReminderTime);
         priorityToggle = view.findViewById(R.id.priorityToggle);
         cbReminder = view.findViewById(R.id.cbReminder);
         layoutReminderTime = view.findViewById(R.id.layoutReminderTime);
         btnCancel = view.findViewById(R.id.btnCancel);
         btnConfirm = view.findViewById(R.id.btnConfirm);
-
         layoutButtons = view.findViewById(R.id.layoutButtons);
+
+        // 初始化Spinner
+        spinnerReminderOptions = view.findViewById(R.id.spinnerReminderOptions);
+
+        // 设置Spinner适配器
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_spinner_item,
+                reminderOptions
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerReminderOptions.setAdapter(adapter);
     }
 
     private void setupClickListeners() {
@@ -103,16 +141,36 @@ public class EventEditDialogFragment extends DialogFragment {
         etEventDate.setOnClickListener(v -> showDatePicker());
         // 时间选择
         etEventTime.setOnClickListener(v -> showTimePicker(etEventTime));
-        etReminderTime.setOnClickListener(v -> showTimePicker(etReminderTime));
 
         // 提醒复选框
         cbReminder.setOnCheckedChangeListener((buttonView, isChecked) -> {
             layoutReminderTime.setVisibility(isChecked ? View.VISIBLE : View.GONE);
+            if (!isChecked) {
+                selectedReminderOffset = "0"; // 不提醒
+            }
         });
 
-        // 优先级按钮组监听 - 简化版本
+        // 优先级按钮组监听
         priorityToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            // MaterialButtonToggleGroup 默认就是单选模式，不需要额外处理
+            updatePriorityButtonColors();
+        });
+
+        // Spinner选择监听
+        spinnerReminderOptions.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedOption = reminderOptions[position];
+                selectedReminderOffset = reminderOptionsMap.get(selectedOption);
+
+                // 如果选择自定义，显示自定义时间输入框
+                if ("custom".equals(selectedReminderOffset)) {
+                    showCustomTimePicker();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
 
         // 取消按钮
@@ -120,10 +178,38 @@ public class EventEditDialogFragment extends DialogFragment {
 
         // 确认按钮
         btnConfirm.setOnClickListener(v -> saveEvent());
+    }
 
-        priorityToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            updatePriorityButtonColors();
-        });
+    private void showCustomTimePicker() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (view, hourOfDay, minute1) -> {
+            // 计算自定义时间相对于事件时间的偏移量（分钟）
+            String eventTimeStr = etEventTime.getText().toString().trim();
+            if (!eventTimeStr.isEmpty()) {
+                try {
+                    String[] eventParts = eventTimeStr.split(":");
+                    int eventHour = Integer.parseInt(eventParts[0]);
+                    int eventMinute = Integer.parseInt(eventParts[1]);
+
+                    int eventTotalMinutes = eventHour * 60 + eventMinute;
+                    int reminderTotalMinutes = hourOfDay * 60 + minute1;
+
+                    int offsetMinutes = eventTotalMinutes - reminderTotalMinutes;
+                    if (offsetMinutes < 0) {
+                        offsetMinutes = 0; // 不能晚于事件时间
+                    }
+
+                    selectedReminderOffset = String.valueOf(offsetMinutes);
+                } catch (Exception e) {
+                    selectedReminderOffset = "0";
+                }
+            }
+        }, hour, minute, true);
+        timePickerDialog.setTitle("选择自定义提醒时间");
+        timePickerDialog.show();
     }
 
     private void loadData() {
@@ -135,14 +221,13 @@ public class EventEditDialogFragment extends DialogFragment {
                 tvDialogTitle.setText("编辑事务");
                 btnConfirm.setText("确认修改");
 
-
                 event = (CalendarEvent) args.getSerializable(ARG_EVENT);
                 if (event != null) {
                     etEventTitle.setText(event.getTitle());
                     etEventDate.setText(event.getDate());
                     etEventTime.setText(event.getTime());
 
-                    // 设置优先级 - 确保正确选中
+                    // 设置优先级
                     switch (event.getPriority()) {
                         case "high":
                             priorityToggle.check(R.id.btnPriorityHigh);
@@ -156,9 +241,15 @@ public class EventEditDialogFragment extends DialogFragment {
                     }
 
                     // 设置提醒
-                    cbReminder.setChecked(event.isReminderEnabled());
-                    etReminderTime.setText(event.getReminderTime());
-                    layoutReminderTime.setVisibility(event.isReminderEnabled() ? View.VISIBLE : View.GONE);
+                    boolean reminderEnabled = event.isReminderEnabled();
+                    cbReminder.setChecked(reminderEnabled);
+                    layoutReminderTime.setVisibility(reminderEnabled ? View.VISIBLE : View.GONE);
+
+                    // 设置提醒选项
+                    if (reminderEnabled) {
+                        String reminderOffset = event.getReminderTime(); // 现在存储偏移分钟数
+                        setReminderSpinnerSelection(reminderOffset);
+                    }
                 }
             } else {
                 tvDialogTitle.setText("添加事务");
@@ -175,8 +266,32 @@ public class EventEditDialogFragment extends DialogFragment {
                 // 默认选中一般紧急
                 priorityToggle.check(R.id.btnPriorityMedium);
                 updatePriorityButtonColors();
+
+                // 默认选择"不提醒"
+                spinnerReminderOptions.setSelection(0);
             }
         }
+    }
+
+    private void setReminderSpinnerSelection(String offsetMinutes) {
+        if (offsetMinutes == null || "0".equals(offsetMinutes)) {
+            spinnerReminderOptions.setSelection(0); // 不提醒
+            return;
+        }
+
+        // 查找匹配的预定义选项
+        for (int i = 0; i < reminderOptions.length; i++) {
+            String option = reminderOptions[i];
+            String optionValue = reminderOptionsMap.get(option);
+            if (offsetMinutes.equals(optionValue)) {
+                spinnerReminderOptions.setSelection(i);
+                return;
+            }
+        }
+
+        // 如果没有匹配的预定义选项，选择自定义
+        spinnerReminderOptions.setSelection(reminderOptions.length - 1); // 最后一个选项是"自定义"
+        selectedReminderOffset = offsetMinutes;
     }
 
     private void showDatePicker() {
@@ -209,7 +324,7 @@ public class EventEditDialogFragment extends DialogFragment {
         String date = etEventDate.getText().toString().trim();
         String time = etEventTime.getText().toString().trim();
 
-        // 获取优先级 - 添加调试日志
+        // 获取优先级
         String priority = "medium";
         int checkedButtonId = priorityToggle.getCheckedButtonId();
         if (checkedButtonId == R.id.btnPriorityHigh) {
@@ -219,7 +334,7 @@ public class EventEditDialogFragment extends DialogFragment {
         }
 
         boolean reminderEnabled = cbReminder.isChecked();
-        String reminderTime = etReminderTime.getText().toString().trim();
+        String reminderTime = selectedReminderOffset; // 存储偏移分钟数
 
         if (title.isEmpty()) {
             etEventTitle.setError("请输入事务标题");
@@ -231,10 +346,6 @@ public class EventEditDialogFragment extends DialogFragment {
         }
         if (time.isEmpty()) {
             etEventTime.setError("请选择时间");
-            return;
-        }
-        if (reminderEnabled && reminderTime.isEmpty()) {
-            etReminderTime.setError("请设置提醒时间");
             return;
         }
 
@@ -261,38 +372,10 @@ public class EventEditDialogFragment extends DialogFragment {
         dismiss();
     }
 
-    private void deleteEvent() {
-        if (event != null) {
-            // 创建确认对话框
-            new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                    .setTitle("确认删除")
-                    .setMessage("确定要删除这个事务吗？此操作不可撤销。")
-                    .setPositiveButton("删除", (dialog, which) -> {
-                        // 用户确认删除，执行删除操作
-                        if (listener != null) {
-                            listener.onEventDelete(event);
-                        }
-                        dismiss();
-                    })
-                    .setNegativeButton("取消", (dialog, which) -> {
-                        // 用户取消，不做任何操作
-                        dialog.dismiss();
-                    })
-                    .create()
-                    .show();
-        }
-    }
-
-    /**
-     * 更新优先级按钮的颜色显示
-     */
     private void updatePriorityButtonColors() {
         int checkedButtonId = priorityToggle.getCheckedButtonId();
-
-        // 重置所有按钮颜色
         resetPriorityButtonColors();
 
-        // 设置选中按钮的颜色
         if (checkedButtonId == R.id.btnPriorityHigh) {
             setPriorityButtonColor(R.id.btnPriorityHigh, R.color.red);
         } else if (checkedButtonId == R.id.btnPriorityMedium) {
@@ -302,23 +385,16 @@ public class EventEditDialogFragment extends DialogFragment {
         }
     }
 
-    /**
-     * 重置所有优先级按钮的颜色
-     */
     private void resetPriorityButtonColors() {
         setPriorityButtonColor(R.id.btnPriorityHigh, R.color.gray_light);
         setPriorityButtonColor(R.id.btnPriorityMedium, R.color.gray_light);
         setPriorityButtonColor(R.id.btnPriorityLow, R.color.gray_light);
     }
 
-    /**
-     * 设置优先级按钮的颜色
-     */
     private void setPriorityButtonColor(int buttonId, int colorResId) {
         MaterialButton button = priorityToggle.findViewById(buttonId);
         if (button != null) {
             button.setBackgroundColor(ContextCompat.getColor(requireContext(), colorResId));
-            // 根据背景色调整文字颜色以确保可读性
             if (colorResId == R.color.red || colorResId == R.color.green) {
                 button.setTextColor(Color.WHITE);
             } else {

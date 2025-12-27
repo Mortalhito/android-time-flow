@@ -1,6 +1,7 @@
 package com.example.timeflow.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,9 +60,9 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
     }
 
     private void loadAllEvents() {
-        calendarEventRepository.loadAllEvents(new CalendarEventRepository.DataLoadListener() {
+        calendarEventRepository.getAllEvents(new CalendarEventRepository.EventListListener() {
             @Override
-            public void onDataLoaded(List<CalendarEvent> events) {
+            public void onEventsLoaded(List<CalendarEvent> events) {
                 eventList.clear();
                 eventList.addAll(events);
                 calendarView.setEventList(eventList);
@@ -123,9 +124,9 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
     }
 
     private void showEventsForDate(String date) {
-        calendarEventRepository.loadEventsByDate(date, new CalendarEventRepository.DataLoadListener() {
+        calendarEventRepository.getEventsByDate(date, new CalendarEventRepository.EventListListener(){
             @Override
-            public void onDataLoaded(List<CalendarEvent> events) {
+            public void onEventsLoaded(List<CalendarEvent> events) {
                 calendarEventAdapter.updateEvents(events);
             }
 
@@ -142,6 +143,10 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
             @Override
             public void onSuccess() {
                 loadAllEvents(); // 重新加载所有事件以更新日历显示
+                Log.d("ReminderDebug", "onEventSave被调用，模式: " + mode);
+                Log.d("ReminderDebug", "事件标题: " + event.getTitle());
+                Log.d("ReminderDebug", "提醒设置: " + event.isReminderEnabled() + ", " + event.getReminderTime());
+
                 Toast.makeText(requireContext(),
                         "add".equals(mode) ? "添加成功" : "修改成功",
                         Toast.LENGTH_SHORT).show();
