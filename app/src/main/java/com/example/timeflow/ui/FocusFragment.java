@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -96,17 +97,19 @@ public class FocusFragment extends Fragment {
         btnStartFocus.setOnClickListener(v -> startFocusMode());
     }
 
-    // 在 FocusFragment.java 中添加/更新以下方法
     private void startFocusMode() {
         int hours = hourPicker.getValue();
         int minutes = minutePicker.getValue();
         int totalMinutes = hours * 60 + minutes;
 
-        if (totalMinutes > 0) {
-            Intent intent = new Intent(getActivity(), FocusLockActivity.class);
-            intent.putExtra("minutes", totalMinutes);
-            startActivity(intent);
+        if (totalMinutes == 0) {
+            Toast.makeText(getContext(), "请选择正确的专注时间", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        Intent intent = new Intent(getActivity(), FocusLockActivity.class);
+        intent.putExtra("minutes", totalMinutes);
+        startActivity(intent);
     }
 
 
