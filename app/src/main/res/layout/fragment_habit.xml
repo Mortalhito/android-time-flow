@@ -29,30 +29,6 @@
 
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/timeRangeToggle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnWeek"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/this_week"
-            android:checked="true"
-            android:backgroundTint="@color/orange_500"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnMonth"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/this_month"
-            android:backgroundTint="@color/orange_500"/>
-
-    </com.google.android.material.button.MaterialButtonToggleGroup>
 
     <TextView
         android:layout_width="match_parent"

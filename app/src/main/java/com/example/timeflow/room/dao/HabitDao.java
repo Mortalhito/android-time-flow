@@ -9,6 +9,7 @@ import androidx.room.Update;
 
 import com.example.timeflow.room.entity.Habit;
 import com.example.timeflow.room.entity.HabitRecord;
+import com.example.timeflow.room.entity.HabitWithStats;
 
 import java.util.List;
 
@@ -49,9 +50,23 @@ public interface HabitDao {
     @Query("SELECT * FROM habit_records WHERE habitId = :habitId AND completionDate = :date")
     HabitRecord getRecordByHabitIdAndDate(long habitId, java.util.Date date);
 
-    @Query("SELECT SUM(completedCount) FROM habit_records WHERE habitId = :habitId")
+    @Query("SELECT SUM(completedCount) FROM habit_records WHERE habitId = :habitId AND completedCount >= 1")
     LiveData<Integer> getTotalCompletedCount(long habitId);
 
-    @Query("SELECT COUNT(DISTINCT DATE(completionDate)) FROM habit_records WHERE habitId = :habitId")
+    // 修改统计方法：统计有完成记录的天数（完成次数>=1）
+    @Query("SELECT COUNT(DISTINCT DATE(completionDate)) FROM habit_records WHERE habitId = :habitId AND completedCount >= 1")
     LiveData<Integer> getTotalCompletedDays(long habitId);
+
+    @Query("SELECT * FROM habit_records WHERE habitId = :habitId AND completionDate = :date AND completedCount >= 1")
+    HabitRecord getTodayCompletedRecord(long habitId, java.util.Date date);
+
+    @Query("SELECT h.*, " +
+            "(SELECT COUNT(DISTINCT DATE(completionDate/1000, 'unixepoch')) " +
+            " FROM habit_records r WHERE r.habitId = h.id AND r.completedCount >= 1) as totalDays, " +
+            "(EXISTS(SELECT 1 FROM habit_records r " +
+            " WHERE r.habitId = h.id " +
+            " AND DATE(completionDate/1000, 'unixepoch', 'localtime') = DATE('now', 'localtime') " +
+            " AND r.completedCount >= 1)) as isCompletedToday " +
+            "FROM habits h ORDER BY h.id DESC")
+    LiveData<List<HabitWithStats>> getAllHabitsWithStats();
 }

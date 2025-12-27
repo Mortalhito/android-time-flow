@@ -1,13 +1,18 @@
 package com.example.timeflow.room.repository;
 
 import android.app.Application;
+import android.os.Handler;
+import android.os.Looper;
+
 import androidx.lifecycle.LiveData;
 
 import com.example.timeflow.room.dao.HabitDao;
 import com.example.timeflow.room.database.AppDatabase;
 import com.example.timeflow.room.entity.Habit;
 import com.example.timeflow.room.entity.HabitRecord;
+import com.example.timeflow.room.entity.HabitWithStats;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -16,7 +21,8 @@ import java.util.concurrent.Executors;
 public class HabitRepository {
     private HabitDao habitDao;
     private ExecutorService executorService;
-
+    private final Handler mainHandler =
+            new Handler(Looper.getMainLooper());
     public HabitRepository(Application application) {
         AppDatabase database = AppDatabase.getInstance(application);
         habitDao = database.habitDao();
@@ -62,9 +68,11 @@ public class HabitRepository {
     }
 
     // 获取或创建今天的记录
-    public void getOrCreateTodayRecord(long habitId, OnRecordReadyCallback callback) {
+
+
+    // 新增：检查习惯今天是否已经完成
+    public void checkTodayCompleted(long habitId, OnTodayCompletedCallback callback) {
         executorService.execute(() -> {
-            // 获取今天的日期（去掉时间部分）
             Date today = new Date();
             java.util.Calendar cal = java.util.Calendar.getInstance();
             cal.setTime(today);
@@ -74,22 +82,51 @@ public class HabitRepository {
             cal.set(java.util.Calendar.MILLISECOND, 0);
             Date todayDate = cal.getTime();
 
-            HabitRecord record = habitDao.getRecordByHabitIdAndDate(habitId, todayDate);
-            if (record == null) {
-                record = new HabitRecord(habitId, todayDate, 0);
-                long recordId = habitDao.insertRecord(record);
-                record.setId(recordId);
-            }
+            HabitRecord record = habitDao.getTodayCompletedRecord(habitId, todayDate);
+            boolean isCompleted = record != null;
 
-            HabitRecord finalRecord = record;
-            // 回到主线程回调
             new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
-                callback.onRecordReady(finalRecord);
+                callback.onTodayChecked(isCompleted);
             });
         });
     }
 
+    public interface OnTodayCompletedCallback {
+        void onTodayChecked(boolean isCompleted);
+    }
+
     public interface OnRecordReadyCallback {
         void onRecordReady(HabitRecord record);
+    }
+
+    public LiveData<List<HabitWithStats>> getAllHabitsWithStats() {
+        return habitDao.getAllHabitsWithStats();
+    }
+
+
+    public void getOrCreateTodayRecord(long habitId, OnRecordReadyCallback callback) {
+        executorService.execute(() -> {
+            Date todayDate = getTodayDate(); // 提取为方法
+
+            HabitRecord record = habitDao.getTodayCompletedRecord(habitId, todayDate);
+
+            if (record == null) {
+                record = new HabitRecord(habitId, todayDate, 0); // 初始为0
+                long id = habitDao.insertRecord(record);
+                record.setId(id);
+            }
+
+            HabitRecord finalRecord = record;
+            mainHandler.post(() -> callback.onRecordReady(finalRecord));
+        });
+    }
+
+    private Date getTodayDate() {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        cal.set(Calendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 }

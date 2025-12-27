@@ -60,50 +60,28 @@ public class HabitFragment extends Fragment {
 
     private void initViews(View view) {
         recyclerView = view.findViewById(R.id.recyclerViewHabits);
-        timeRangeToggle = view.findViewById(R.id.timeRangeToggle);
+
         btnAddHabit = view.findViewById(R.id.btnAddHabit);
         chartContainer = view.findViewById(R.id.chartContainer);
     }
 
     private void setupRecyclerView() {
-        if (habitList == null) {
-            habitList = new ArrayList<>();
-        }
-
-        adapter = new HabitAdapter(habitList, (habit, position, isChecked) -> {
-            if (habit != null) {
-                habitViewModel.getOrCreateTodayRecord(habit.getId());
-                habitViewModel.getCurrentRecord().observe(getViewLifecycleOwner(), record -> {
-                    if (record != null) {
-                        if (isChecked) {
-                            record.setCompletedCount(record.getCompletedCount() + 1);
-                        } else {
-                            record.setCompletedCount(Math.max(0, record.getCompletedCount() - 1));
-                        }
-                        habitViewModel.updateRecord(record);
-                    }
-                });
-            }
-        }, habitViewModel); // 添加 habitViewModel 参数
-
+        adapter = new HabitAdapter(habitViewModel);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
     }
 
     private void setupViewModel() {
         habitViewModel = new ViewModelProvider(this).get(HabitViewModel.class);
-        habitViewModel.getAllHabits().observe(getViewLifecycleOwner(), habits -> {
-            if (habits != null) {
-                habitList.clear();
-                habitList.addAll(habits);
-                if (adapter != null) {
-                    adapter.updateData(habitList);
-                }
-                setupSimpleChart();
-            }
 
+        habitViewModel.getAllHabitsWithStats().observe(getViewLifecycleOwner(), list -> {
+            if (list != null) {
+                adapter.submitList(list);
+            }
         });
     }
+
+
 
     private void setupSimpleChart() {
         chartContainer.removeAllViews();
@@ -137,22 +115,27 @@ public class HabitFragment extends Fragment {
     }
 
     private float calculateCompletionRate(Habit habit) {
-        // 这里需要从HabitRecord中获取实际完成率
-        // 暂时返回一个默认值
-        return 50.0f;
+        // 获取习惯的周目标天数
+        int weeklyTargetDays = habit.getWeeklyTargetDays();
+        if (weeklyTargetDays == 0) return 0f;
+
+        // 这里需要从ViewModel获取实际完成数据
+        // 暂时使用模拟数据，实际应该从数据库获取
+        int completedDays = 0;
+        int totalWeeks = 1; // 从开始日期到现在的周数
+
+        // 计算完成率：实际完成天数 / 应该完成的天数
+        float completionRate = 0f;
+        if (totalWeeks > 0) {
+            int targetDays = weeklyTargetDays * totalWeeks;
+            completionRate = targetDays > 0 ? ((float) completedDays / targetDays) * 100 : 0f;
+        }
+
+        return Math.min(completionRate, 100f);
     }
 
     private void setClickListeners() {
-        timeRangeToggle.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
-            if (isChecked) {
-                if (checkedId == R.id.btnWeek) {
-                    isWeekMode = true;
-                } else if (checkedId == R.id.btnMonth) {
-                    isWeekMode = false;
-                }
-                setupSimpleChart();
-            }
-        });
+        
 
         btnAddHabit.setOnClickListener(v -> showAddHabitDialog());
     }
@@ -329,11 +312,11 @@ public class HabitFragment extends Fragment {
     }
 
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (adapter != null) {
-            adapter.clear();
-        }
-    }
+//    @Override
+//    public void onDestroyView() {
+//        super.onDestroyView();
+//        if (adapter != null) {
+//            adapter.clear();
+//        }
+//    }
 }

@@ -10,7 +10,7 @@
         <item name="backgroundTint">@null</item>
         <item name="strokeColor">@null</item>
         <item name="android:background">@drawable/btn_week_day_selector</item>
-        <item name="android:textColor">@color/week_day_text_color</item>
+        <item name="android:textColor">@drawable/week_day_text_color</item>
         <item name="android:layout_width">38dp</item>
         <item name="android:layout_height">38dp</item>
         <item name="android:layout_margin">2dp</item>

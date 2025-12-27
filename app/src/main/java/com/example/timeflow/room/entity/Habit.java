@@ -8,6 +8,7 @@ import androidx.room.TypeConverters;
 import com.example.timeflow.utils.Converters;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -40,11 +41,15 @@ public class Habit {
 
     // 检查今天是否需要完成
     public boolean isTodayInFrequency() {
-        if (days.isEmpty()) return true;
+        if (days == null || days.isEmpty()) return true;
 
-        java.util.Calendar calendar = java.util.Calendar.getInstance();
-        int today = calendar.get(java.util.Calendar.DAY_OF_WEEK);
-        // Calendar中周日=1，周一=2，...，周六=7
+        if (random) {
+            // 周随机模式：只要还没到周结束，都应该显示（由用户决定哪天完成）
+            return true;
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        int today = calendar.get(Calendar.DAY_OF_WEEK);
         return days.contains(today);
     }
 
@@ -57,6 +62,12 @@ public class Habit {
             // 周定期：days的大小表示每周固定完成几天
             return days.size();
         }
+    }
+
+    // 新增：判断习惯今天是否应该显示在未完成区
+    public boolean shouldShowInUncompleted() {
+        return isTodayInFrequency();
+        // 完成状态由数据库查询决定，这里只判断频率
     }
 
     // Getters and Setters
