@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="320dp"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="30dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌟"
+        android:textSize="50sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="专注达成！"
+        android:textColor="#333333"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSuccessMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:lineSpacingExtra="8dp"
+        android:text="本次专注：25 分钟\n今日总计：120 分钟"
+        android:textColor="#666666"
+        android:textSize="16sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:text="干得漂亮，现在去休息一下吧。"
+        android:textColor="#999999"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btnSuccessConfirm"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#4CAF50"
+        android:text="我知道了"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp" />
+</LinearLayout>
