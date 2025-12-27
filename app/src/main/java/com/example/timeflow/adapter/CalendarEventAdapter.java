@@ -17,13 +17,22 @@ public class CalendarEventAdapter extends RecyclerView.Adapter<CalendarEventAdap
 
     private List<CalendarEvent> eventList;
     private OnItemClickListener onItemClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(CalendarEvent event);
     }
 
+    public interface OnItemLongClickListener {
+        void onItemLongClick(CalendarEvent event);
+    }
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener listener) {
+        this.onItemLongClickListener = listener;
     }
 
     public CalendarEventAdapter(List<CalendarEvent> eventList) {
@@ -52,6 +61,14 @@ public class CalendarEventAdapter extends RecyclerView.Adapter<CalendarEventAdap
             if (onItemClickListener != null) {
                 onItemClickListener.onItemClick(event);
             }
+        });
+
+        holder.itemView.setOnLongClickListener(v -> {
+            if (onItemLongClickListener != null) {
+                onItemLongClickListener.onItemLongClick(event);
+                return true; // 消费长按事件
+            }
+            return false;
         });
     }
 

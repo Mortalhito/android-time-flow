@@ -68,8 +68,7 @@ public class CalendarEventRepository {
                 eventDao.updateEvent(event);
 
                 // 设置新提醒
-                if (event.isReminderEnabled() && event.getReminderTime() != null &&
-                        !"0".equals(event.getReminderTime())) {
+                if (event.isReminderEnabled() && event.getReminderTime() != null) {
                     ReminderService.scheduleReminder(context, event);
                 }
 

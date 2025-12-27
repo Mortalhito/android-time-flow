@@ -1,5 +1,6 @@
 package com.example.timeflow.ui;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -114,13 +115,32 @@ public class HomeFragment extends Fragment implements EventEditDialogFragment.On
 
     private void setupEventList() {
         calendarEventAdapter = new CalendarEventAdapter(eventList);
+
+        // 点击事件 - 编辑
         calendarEventAdapter.setOnItemClickListener(event -> {
             EventEditDialogFragment dialog = EventEditDialogFragment.newInstance(event);
             dialog.setOnEventSaveListener(HomeFragment.this);
             dialog.show(getParentFragmentManager(), "EventEditDialogFragment");
         });
+
+        // 长按事件 - 删除
+        calendarEventAdapter.setOnItemLongClickListener(event -> {
+            showDeleteConfirmationDialog(event);
+        });
+
         recyclerViewEvents.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerViewEvents.setAdapter(calendarEventAdapter);
+    }
+
+    private void showDeleteConfirmationDialog(CalendarEvent event) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("删除事务")
+                .setMessage("确定要删除 \"" + event.getTitle() + "\" 吗？")
+                .setPositiveButton("删除", (dialog, which) -> {
+                    onEventDelete(event);
+                })
+                .setNegativeButton("取消", null)
+                .show();
     }
 
     private void showEventsForDate(String date) {
